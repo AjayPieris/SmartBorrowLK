@@ -1,0 +1,63 @@
+@model SmartBorrowLK.ViewModels.CreateBookingViewModel
+@{ ViewData["Title"] = "Book Item"; }
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title">Book @Model.ItemName</h3>
+                <p class="text-muted">Rate: Rs. @Model.PricePerDay.ToString("N0") / day</p>
+
+                <form asp-action="Book" method="post">
+                    <input type="hidden" asp-for="ListingId" />
+                    <input type="hidden" asp-for="ItemName" />
+                    <input type="hidden" asp-for="PricePerDay" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="StartDate" class="form-label"></label>
+                        <input asp-for="StartDate" class="form-control" id="startDate" />
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="EndDate" class="form-label"></label>
+                        <input asp-for="EndDate" class="form-control" id="endDate" />
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <strong>Total Estimated Cost: </strong> Rs. <span id="totalCost">0</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Confirm Booking</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simple script to calculate the total price dynamically on the frontend
+    const pricePerDay = @Model.PricePerDay;
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+    const totalDisplay = document.getElementById('totalCost');
+
+    function calculateTotal() {
+        const start = new Date(startInput.value);
+        const end = new Date(endInput.value);
+        
+        if (start && end && end > start) {
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            totalDisplay.innerText = (diffDays * pricePerDay).toLocaleString();
+        } else {
+            totalDisplay.innerText = "0";
+        }
+    }
+
+    startInput.addEventListener('change', calculateTotal);
+    endInput.addEventListener('change', calculateTotal);
+</script>

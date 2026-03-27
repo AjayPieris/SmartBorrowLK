@@ -1,0 +1,63 @@
+using Microsoft.EntityFrameworkCore;
+using SmartBorrowLK.Data;
+using SmartBorrowLK.Models;
+using SmartBorrowLK.ViewModels;
+
+namespace SmartBorrowLK.Services
+{
+    public interface IBookingService
+    {
+        Task<bool> IsItemAvailableAsync(int listingId, DateTime startDate, DateTime endDate);
+        Task<Booking?> CreateBookingAsync(int userId, CreateBookingViewModel model);
+        Task<List<Booking>> GetUserBookingsAsync(int userId);
+    }
+
+    public class BookingService : IBookingService
+    {
+        private readonly AppDbContext _context;
+
+        public BookingService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<bool> IsItemAvailableAsync(int listingId, DateTime startDate, DateTime endDate)
+        {
+            // Check if there are any existing bookings for this listing that overlap with the requested dates
+            bool hasOverlap = await _context.Bookings.AnyAsync(b => 
+                b.ListingId == listingId &&
+                b.StartDate < endDate && 
+                b.EndDate > startDate);
+
+            return !hasOverlap;
+        }
+
+        public async Task<Booking?> CreateBookingAsync(int userId, CreateBookingViewModel model)
+        {
+            var isAvailable = await IsItemAvailableAsync(model.ListingId, model.StartDate, model.EndDate);
+            if (!isAvailable) return null;
+
+            var booking = new Booking
+            {
+                ListingId = model.ListingId,
+                UserId = userId,
+                StartDate = model.StartDate.ToUniversalTime(), // Postgres requires UTC dates
+                EndDate = model.EndDate.ToUniversalTime()
+            };
+
+            _context.Bookings.Add(booking);
+            await _context.SaveChangesAsync();
+            return booking;
+        }
+
+        public async Task<List<Booking>> GetUserBookingsAsync(int userId)
+        {
+            return await _context.Bookings
+                .Include(b => b.Listing)
+                .ThenInclude(l => l.Item)
+                .Where(b => b.UserId == userId)
+                .OrderByDescending(b => b.StartDate)
+                .ToListAsync();
+        }
+    }
+}
