@@ -1,0 +1,50 @@
+@model SmartBorrowLK.ViewModels.CreateReviewViewModel
+@{ ViewData["Title"] = "Write a Review"; }
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title">Review @Model.ItemName</h3>
+                <p class="text-muted">Your feedback helps keep the SmartBorrow LK community safe.</p>
+
+                <form asp-action="Create" method="post" id="reviewForm">
+                    <input type="hidden" asp-for="ListingId" />
+                    <input type="hidden" asp-for="ItemName" />
+
+                    <div class="mb-3">
+                        <label asp-for="Rating" class="form-label">Rating (1 to 5 Stars)</label>
+                        <select asp-for="Rating" class="form-select">
+                            <option value="5">⭐⭐⭐⭐⭐ - Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ - Good</option>
+                            <option value="3">⭐⭐⭐ - Average</option>
+                            <option value="2">⭐⭐ - Poor</option>
+                            <option value="1">⭐ - Terrible</option>
+                        </select>
+                        <span asp-validation-for="Rating" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Comment" class="form-label">Your Experience</label>
+                        <textarea asp-for="Comment" class="form-control" rows="4" placeholder="How was the equipment? Was the owner communicative?"></textarea>
+                        <span asp-validation-for="Comment" class="text-danger"></span>
+                        <small class="text-muted mt-1 d-block"><em>Note: Our AI will review this comment for inappropriate language before publishing.</em></small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                        <span id="btnText">Submit Review</span>
+                        <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('reviewForm').addEventListener('submit', function() {
+        document.getElementById('btnText').innerText = 'AI is analyzing your review...';
+        document.getElementById('btnSpinner').classList.remove('d-none');
+        document.getElementById('submitBtn').disabled = true;
+    });
+</script>

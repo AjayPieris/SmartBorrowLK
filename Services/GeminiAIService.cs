@@ -10,6 +10,8 @@ namespace SmartBorrowLK.Services
     {
         Task<string> GenerateListingDetailsAsync(string inputText);
         Task<int> CalculateRiskScoreAsync(string description, decimal price);
+
+        Task<string> AnalyzeReviewAsync(string reviewComment);
     }
 
     public class GeminiAIService : IAIService
@@ -26,7 +28,7 @@ namespace SmartBorrowLK.Services
         private async Task<string> CallGeminiApiAsync(string prompt)
         {
             var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={_apiKey}";
-            
+
             var requestBody = new
             {
                 contents = new[] { new { parts = new[] { new { text = prompt } } } }
@@ -38,7 +40,7 @@ namespace SmartBorrowLK.Services
 
             var responseString = await response.Content.ReadAsStringAsync();
             using var document = JsonDocument.Parse(responseString);
-            
+
             return document.RootElement
                 .GetProperty("candidates")[0]
                 .GetProperty("content")
@@ -69,6 +71,22 @@ namespace SmartBorrowLK.Services
             var response = await CallGeminiApiAsync(prompt);
             int.TryParse(response.Trim(), out int score);
             return score;
+        }
+
+        public async Task<string> AnalyzeReviewAsync(string reviewComment)
+        {
+            var prompt = $@"
+    Analyze this rental marketplace review: '{reviewComment}'.
+    1. Clean the review (fix minor typos, remove offensive language).
+    2. Determine the sentiment (Positive, Neutral, Negative).
+    3. Calculate a Trust Score from 0 to 100 based on authenticity and detail.
+    
+    Return a JSON response strictly with these keys: 
+    'CleanComment' (string), 
+    'Sentiment' (string), 
+    'TrustScore' (integer).";
+
+            return await CallGeminiApiAsync(prompt);
         }
     }
 }
