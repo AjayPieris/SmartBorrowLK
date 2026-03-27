@@ -1,61 +1,69 @@
 @model SmartBorrowLK.ViewModels.CreateListingViewModel
 @{ ViewData["Title"] = "Create Listing"; }
 
-<div class="container py-4">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <h2 class="fw-bold mb-1"><i class="bi bi-plus-circle"></i> List Your Gear</h2>
-            <p class="text-muted mb-4">Tell us about your item. Our AI will generate a professional description and rental terms. You can set your own price or let AI suggest one.</p>
+        <div class="col-lg-7 col-md-9">
+            <div class="mb-4 text-center">
+                <span class="badge bg-primary-subtle px-3 py-2 rounded-pill mb-3">
+                    <i class="bi bi-robot"></i> AI-Powered Listing
+                </span>
+                <h2 class="fw-bold" style="color: var(--sb-secondary);">List Your Gear</h2>
+                <p class="text-muted">Our AI handles the heavy lifting – we generate a professional description, rental terms, and suggested pricing instantly.</p>
+            </div>
 
-            <div class="card sb-card">
-                <div class="card-body p-4">
+            <div class="sb-card border-0 shadow-sm overflow-hidden">
+                <div class="bg-primary p-4 text-white text-center">
+                    <h5 class="mb-0 fw-semibold"><i class="bi bi-box-seam me-2"></i> Item Details</h5>
+                </div>
+                <div class="card-body p-4 p-md-5">
                     <form asp-action="Create" method="post" enctype="multipart/form-data" id="createForm">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4 small fw-medium bg-danger-subtle p-3 rounded"></div>
 
-                        <div class="mb-3">
-                            <label asp-for="ItemName" class="form-label"></label>
-                            <input asp-for="ItemName" class="form-control" placeholder="e.g., DJI Mini 3 Pro Drone" />
-                            <span asp-validation-for="ItemName" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="ItemName" class="form-label fw-semibold">Item Name</label>
+                            <input asp-for="ItemName" class="form-control form-control-lg bg-light" placeholder="e.g., DJI Mini 3 Pro Drone" />
+                            <span asp-validation-for="ItemName" class="text-danger small mt-1 d-block"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Condition" class="form-label"></label>
-                            <select asp-for="Condition" class="form-select">
-                                <option value="Brand New">Brand New</option>
-                                <option value="Like New">Like New</option>
-                                <option value="Good">Good</option>
-                                <option value="Fair">Fair</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="RawDescription" class="form-label"></label>
-                            <textarea asp-for="RawDescription" class="form-control" rows="3"
-                                      placeholder="e.g., Sony A7III mirrorless camera, bought last year, used twice. Comes with 2 batteries and a hard case."></textarea>
-                            <span asp-validation-for="RawDescription" class="text-danger"></span>
-                            <small class="text-muted d-block mt-1"><i class="bi bi-stars"></i> AI will generate a professional description, terms, and risk score from this.</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="ManualPrice" class="form-label"></label>
-                            <div class="input-group">
-                                <span class="input-group-text" style="background: var(--sb-bg); border-color: var(--sb-border); color: var(--sb-text-muted);">Rs.</span>
-                                <input asp-for="ManualPrice" class="form-control" type="number" step="50" min="0"
-                                       placeholder="e.g., 2500 (leave blank for AI suggestion)" />
+                        <div class="row mb-4">
+                            <div class="col-sm-6 mb-4 mb-sm-0">
+                                <label asp-for="Condition" class="form-label fw-semibold">Condition</label>
+                                <select asp-for="Condition" class="form-select form-select-lg bg-light">
+                                    <option value="Brand New">Brand New</option>
+                                    <option value="Like New">Like New</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                </select>
                             </div>
-                            <span asp-validation-for="ManualPrice" class="text-danger"></span>
-                            <small class="text-muted d-block mt-1"><i class="bi bi-info-circle"></i> If left blank, AI will suggest a price based on the item description.</small>
+                            <div class="col-sm-6">
+                                <label asp-for="Image" class="form-label fw-semibold">Upload Photo</label>
+                                <input asp-for="Image" type="file" class="form-control form-control-lg bg-light" accept="image/*" />
+                                <span asp-validation-for="Image" class="text-danger small mt-1 d-block"></span>
+                            </div>
                         </div>
 
                         <div class="mb-4">
-                            <label asp-for="Image" class="form-label"></label>
-                            <input asp-for="Image" type="file" class="form-control" accept="image/*" />
-                            <span asp-validation-for="Image" class="text-danger"></span>
+                            <label asp-for="RawDescription" class="form-label fw-semibold">Short Description</label>
+                            <textarea asp-for="RawDescription" class="form-control bg-light" rows="3"
+                                      placeholder="e.g., Sony A7III purchased last year, comes with 2 batteries and a hard case."></textarea>
+                            <span asp-validation-for="RawDescription" class="text-danger small mt-1 d-block"></span>
+                            <div class="form-text mt-2"><i class="bi bi-magic text-primary"></i> Write a simple sentence. AI will expand this into a rich, SEO-friendly description.</div>
                         </div>
 
-                        <button type="submit" class="btn btn-accent w-100 py-2" id="submitBtn">
-                            <span id="btnText"><i class="bi bi-stars"></i> Generate Listing with AI</span>
-                            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                        <div class="mb-5">
+                            <label asp-for="ManualPrice" class="form-label fw-semibold">Your Price Per Day (Optional)</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text border-end-0 bg-light">Rs.</span>
+                                <input asp-for="ManualPrice" class="form-control bg-light border-start-0 ps-0" type="number" step="50" min="0" placeholder="e.g., 2500" />
+                            </div>
+                            <span asp-validation-for="ManualPrice" class="text-danger small mt-1 d-block"></span>
+                            <div class="form-text mt-2"><i class="bi bi-info-circle"></i> Leave blank and AI will suggest an optimal rental price based on the item.</div>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm py-3" type="submit" id="submitBtn">
+                            <i class="bi bi-stars me-2"></i> <span id="btnText" class="fw-semibold">Generate with AI</span>
+                            <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
                         </button>
                     </form>
                 </div>
@@ -66,7 +74,7 @@
 
 <script>
     document.getElementById('createForm').addEventListener('submit', function() {
-        document.getElementById('btnText').innerHTML = '<i class="bi bi-hourglass-split"></i> Generating (this takes a few seconds)...';
+        document.getElementById('btnText').innerText = 'Generating Listing...';
         document.getElementById('btnSpinner').classList.remove('d-none');
         document.getElementById('submitBtn').disabled = true;
     });

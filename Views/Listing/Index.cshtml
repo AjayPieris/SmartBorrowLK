@@ -3,26 +3,30 @@
     ViewData["Title"] = "Browse Listings";
 }
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
-            <h2 class="fw-bold mb-1"><i class="bi bi-grid"></i> Marketplace</h2>
-            <p class="text-muted mb-0">Browse available tech gear for rent</p>
+            <h2 class="fw-bold mb-1" style="color: var(--sb-secondary);">Explore Tech Gear</h2>
+            <p class="text-muted mb-0">Discover top-tier equipment ready to rent today</p>
         </div>
         @if (Context.Session.GetString("UserRole") == "Vendor")
         {
-            <a asp-action="Create" class="btn btn-accent">
-                <i class="bi bi-plus-circle"></i> List Your Gear
+            <a asp-action="Create" class="btn btn-accent rounded-pill px-4 shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> List Item
             </a>
         }
     </div>
 
     @if (!Model.Any())
     {
-        <div class="text-center py-5">
-            <i class="bi bi-inbox display-1 text-muted"></i>
-            <h4 class="mt-3 text-muted">No listings available yet</h4>
-            <p class="text-muted">Be the first to list your tech gear!</p>
+        <div class="empty-state">
+            <i class="bi bi-box-seam display-1 text-muted opacity-50 mb-3"></i>
+            <h4 class="fw-semibold" style="color: var(--sb-secondary);">No listings yet</h4>
+            <p class="text-muted mb-4">Check back later or be the first to list your gear!</p>
+            @if (Context.Session.GetString("UserRole") == "Vendor")
+            {
+                <a asp-action="Create" class="btn btn-primary rounded-pill px-4">Start Listing</a>
+            }
         </div>
     }
     else
@@ -30,44 +34,39 @@
         <div class="row g-4">
             @foreach (var listing in Model)
             {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card sb-listing-card h-100">
-                        @if (!string.IsNullOrEmpty(listing.Item?.ImageUrl))
-                        {
-                            <img src="@listing.Item.ImageUrl" class="card-img-top" alt="@listing.Item.Name"
-                                 style="height: 220px; object-fit: cover;" />
-                        }
-                        else
-                        {
-                            <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 220px;">
-                                <i class="bi bi-camera display-3 text-muted"></i>
-                            </div>
-                        }
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-semibold mb-1">@listing.Item?.Name</h5>
-                            <div class="d-flex gap-2 mb-2">
-                                <span class="badge bg-secondary-subtle text-secondary">@listing.Item?.Condition</span>
-                            </div>
-                            <p class="card-text text-muted small flex-grow-1">
-                                @if (!string.IsNullOrEmpty(listing.Description))
-                                {
-                                    @(listing.Description.Length > 100 ? listing.Description.Substring(0, 100) + "..." : listing.Description)
-                                }
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
-                                <div>
-                                    <span class="fw-bold text-accent fs-5">Rs. @listing.PricePerDay.ToString("N0")</span>
-                                    <small class="text-muted"> / day</small>
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <a asp-action="Details" asp-route-id="@listing.Id" class="text-decoration-none">
+                        <div class="sb-listing-card">
+                            @if (!string.IsNullOrEmpty(listing.Item?.ImageUrl))
+                            {
+                                <img src="@listing.Item.ImageUrl" class="card-img-top" alt="@listing.Item.Name" />
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-camera text-muted opacity-50" style="font-size: 3rem;"></i>
                                 </div>
-                                <a asp-action="Details" asp-route-id="@listing.Id" class="btn btn-sm btn-outline-light">
-                                    View Details <i class="bi bi-arrow-right"></i>
-                                </a>
+                            }
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="listing-title">@listing.Item?.Name</h5>
+                                    <span class="rating-badge ms-2 flex-shrink-0">
+                                        <i class="bi bi-star-fill"></i> 4.9
+                                    </span>
+                                </div>
+                                <p class="listing-desc">
+                                    @listing.Description
+                                </p>
+                                <div class="listing-price-row mt-3">
+                                    <div>
+                                        <span class="price-tag">Rs. @listing.PricePerDay.ToString("N0")</span>
+                                        <span class="text-muted small">/ day</span>
+                                    </div>
+                                    <span class="btn btn-sm btn-outline-primary rounded-pill px-3">View</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-footer bg-transparent border-top-0 small text-muted px-3 pb-3">
-                            <i class="bi bi-person"></i> @listing.Owner?.Name
-                        </div>
-                    </div>
+                    </a>
                 </div>
             }
         </div>

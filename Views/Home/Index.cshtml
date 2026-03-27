@@ -1,118 +1,93 @@
-@{
-    ViewData["Title"] = "Home";
-    var isLoggedIn = !string.IsNullOrEmpty(Context.Session.GetString("UserName"));
-}
+@{ ViewData["Title"] = "Home Page"; }
 
 <!-- Hero Section -->
-<section class="sb-hero">
-    <div class="container">
-        <div class="row align-items-center min-vh-75">
-            <div class="col-lg-7">
-                <span class="badge bg-accent-subtle text-accent mb-3 px-3 py-2 rounded-pill">
-                    <i class="bi bi-stars"></i> AI-Powered Marketplace
+<section class="sb-hero text-center position-relative overflow-hidden">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 py-5">
+                <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-semibold">
+                    <i class="bi bi-stars"></i> Sri Lanka's #1 Tech Rental Marketplace
                 </span>
-                <h1 class="display-3 fw-bold mb-3">
-                    Rent Premium Tech<br />
-                    <span class="text-gradient">Across Sri Lanka</span>
-                </h1>
-                <p class="lead text-light-muted mb-4" style="max-width: 540px;">
-                    Cameras, drones, laptops, microphones — rent what you need, when you need it. 
-                    AI-powered pricing, fraud detection, and smart reviews keep everyone safe.
+                <h1 class="hero-title">Rent Smart. Earn Easy.</h1>
+                <p class="hero-subtitle">
+                    AI-powered tech rental platform in Sri Lanka. Borrow top-tier cameras, laptops, drones, 
+                    and gear instantly. Or list your idle tech to earn passive income.
                 </p>
-                <div class="d-flex gap-3 flex-wrap">
-                    <a asp-controller="Listing" asp-action="Index" class="btn btn-accent btn-lg px-4">
-                        <i class="bi bi-search"></i> Browse Gear
+                
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
+                    <a asp-controller="Listing" asp-action="Index" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">
+                        <i class="bi bi-search me-2"></i> Browse Items
                     </a>
-                    @if (!isLoggedIn)
+                    @if (Context.Session.GetString("UserRole") == "Vendor")
                     {
-                        <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-light btn-lg px-4">
-                            <i class="bi bi-person-plus"></i> Start Renting
+                        <a asp-controller="Listing" asp-action="Create" class="btn btn-outline-primary btn-lg rounded-pill px-5">
+                            <i class="bi bi-plus-circle me-2"></i> List Your Item
                         </a>
                     }
-                    else
+                    else if (Context.Session.GetString("UserRole") == null)
                     {
-                        <a asp-controller="Listing" asp-action="Create" class="btn btn-outline-light btn-lg px-4">
-                            <i class="bi bi-plus-circle"></i> List Your Gear
+                        <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-primary btn-lg rounded-pill px-5">
+                            <i class="bi bi-person-plus me-2"></i> Become a Vendor
                         </a>
                     }
-                </div>
-            </div>
-            <div class="col-lg-5 d-none d-lg-block text-center">
-                <div class="hero-visual">
-                    <i class="bi bi-camera-reels display-1 text-accent"></i>
-                    <i class="bi bi-laptop display-2 text-info ms-3"></i>
-                    <i class="bi bi-mic display-2 text-warning ms-3"></i>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Features Section -->
-<section class="py-5">
-    <div class="container">
+<!-- Featured Categories / Features (Alternative since Featured Listings require backend logic) -->
+<section class="py-5" style="background-color: var(--sb-bg);">
+    <div class="container py-4">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">How It Works</h2>
-            <p class="text-muted">Three simple steps to rent or list tech gear</p>
+            <h2 class="fw-bold mb-2">How It Works</h2>
+            <p class="text-muted">A seamless experience powered by Artificial Intelligence</p>
         </div>
-        <div class="row g-4">
+
+        <div class="row g-4 text-center">
             <div class="col-md-4">
-                <div class="card sb-feature-card h-100 text-center">
-                    <div class="card-body p-4">
-                        <div class="feature-icon bg-primary-subtle rounded-circle mx-auto mb-3">
-                            <i class="bi bi-pencil-square display-6 text-primary"></i>
-                        </div>
-                        <h5 class="fw-semibold">Describe Your Item</h5>
-                        <p class="text-muted small">Type a simple description. Our AI generates professional listings with pricing and rental terms automatically.</p>
+                <div class="sb-card p-5 h-100 border-0">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-4" style="width: 80px; height: 80px; font-size: 2rem;">
+                        <i class="bi bi-magic"></i>
                     </div>
+                    <h4 class="fw-semibold">AI Auto-Listings</h4>
+                    <p class="text-muted">Vendors just type a single sentence. Our AI instantly generates professional descriptions and rental prices.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card sb-feature-card h-100 text-center">
-                    <div class="card-body p-4">
-                        <div class="feature-icon bg-success-subtle rounded-circle mx-auto mb-3">
-                            <i class="bi bi-shield-check display-6 text-success"></i>
-                        </div>
-                        <h5 class="fw-semibold">AI Risk Screening</h5>
-                        <p class="text-muted small">Every listing gets an AI risk score. Admins review flagged items before they go live, keeping the marketplace safe.</p>
+                <div class="sb-card p-5 h-100 border-0">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-4" style="width: 80px; height: 80px; font-size: 2rem;">
+                        <i class="bi bi-shield-check"></i>
                     </div>
+                    <h4 class="fw-semibold">Smart Risk Scoring</h4>
+                    <p class="text-muted">Every item goes through AI risk evaluation. High-value, high-risk items are securely reviewed before going live.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card sb-feature-card h-100 text-center">
-                    <div class="card-body p-4">
-                        <div class="feature-icon bg-warning-subtle rounded-circle mx-auto mb-3">
-                            <i class="bi bi-calendar-check display-6 text-warning"></i>
-                        </div>
-                        <h5 class="fw-semibold">Book & Review</h5>
-                        <p class="text-muted small">Check availability, book instantly, and leave AI-analyzed reviews with trust scores after your rental.</p>
+                <div class="sb-card p-5 h-100 border-0">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-warning-subtle text-warning rounded-circle mb-4" style="width: 80px; height: 80px; font-size: 2rem;">
+                        <i class="bi bi-calendar-event"></i>
                     </div>
+                    <h4 class="fw-semibold">Easy Booking</h4>
+                    <p class="text-muted">Find exactly what you need, book it for specific dates seamlessly, and leave a review once returned.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Stats Section -->
-<section class="py-5 sb-stats-section">
-    <div class="container">
-        <div class="row text-center g-4">
-            <div class="col-6 col-md-3">
-                <h3 class="fw-bold text-accent mb-1">AI-Powered</h3>
-                <small class="text-muted">Gemini AI Integration</small>
-            </div>
-            <div class="col-6 col-md-3">
-                <h3 class="fw-bold text-accent mb-1">Secure</h3>
-                <small class="text-muted">Risk Detection Built-in</small>
-            </div>
-            <div class="col-6 col-md-3">
-                <h3 class="fw-bold text-accent mb-1">LKR</h3>
-                <small class="text-muted">Local Currency Pricing</small>
-            </div>
-            <div class="col-6 col-md-3">
-                <h3 class="fw-bold text-accent mb-1">Cloud</h3>
-                <small class="text-muted">Cloudinary Image Hosting</small>
-            </div>
-        </div>
+<!-- Call to Action -->
+<section class="py-5 bg-white border-top border-bottom border-light">
+    <div class="container py-4 text-center">
+        <h2 class="fw-bold mb-3">Ready to transform your unused tech into cash?</h2>
+        <p class="text-muted mb-4">Join hundreds of vendors earning daily on SmartBorrow LK.</p>
+        @if (Context.Session.GetString("UserRole") == "Vendor")
+        {
+            <a asp-controller="Listing" asp-action="Create" class="btn btn-accent btn-lg px-5 rounded-pill shadow-sm">Start Earning Today</a>
+        }
+        else
+        {
+            <a asp-controller="Auth" asp-action="Register" class="btn btn-accent btn-lg px-5 rounded-pill shadow-sm">Create an Account</a>
+        }
     </div>
 </section>

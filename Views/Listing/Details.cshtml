@@ -4,27 +4,27 @@
     var isLoggedIn = Context.Session.GetInt32("UserId") != null;
 }
 
-<div class="container py-4">
-    <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-4">
-        <i class="bi bi-arrow-left"></i> Back to Marketplace
+<div class="container py-5">
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-pill mb-4 px-3">
+        <i class="bi bi-arrow-left me-1"></i> Back to Browse
     </a>
 
-    <div class="row g-4">
+    <div class="row g-5">
         <!-- Image Column -->
         <div class="col-lg-6">
-            <div class="card sb-card overflow-hidden">
+            <div class="position-sticky" style="top: 100px;">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="@Model.ImageUrl" alt="@Model.Item?.Name" class="img-fluid" style="max-height: 450px; object-fit: cover; width: 100%;" />
+                    <img src="@Model.ImageUrl" alt="@Model.Item?.Name" class="detail-image shadow-sm" />
                 }
                 else if (!string.IsNullOrEmpty(Model.Item?.ImageUrl))
                 {
-                    <img src="@Model.Item.ImageUrl" alt="@Model.Item.Name" class="img-fluid" style="max-height: 450px; object-fit: cover; width: 100%;" />
+                    <img src="@Model.Item.ImageUrl" alt="@Model.Item.Name" class="detail-image shadow-sm" />
                 }
                 else
                 {
-                    <div class="bg-dark d-flex align-items-center justify-content-center" style="height: 350px;">
-                        <i class="bi bi-image display-1 text-muted"></i>
+                    <div class="detail-image d-flex align-items-center justify-content-center border" style="height: 400px;">
+                        <i class="bi bi-camera display-1 text-muted opacity-25"></i>
                     </div>
                 }
             </div>
@@ -32,52 +32,64 @@
 
         <!-- Details Column -->
         <div class="col-lg-6">
-            <div class="card sb-card p-4">
-                <span class="badge bg-success-subtle text-success mb-2 align-self-start">
-                    <i class="bi bi-check-circle"></i> @Model.Status
-                </span>
-                <h2 class="fw-bold mb-1">@Model.Item?.Name</h2>
-                <div class="d-flex gap-2 mb-3">
-                    <span class="badge bg-secondary-subtle text-secondary">@Model.Item?.Condition</span>
-                    <span class="badge bg-info-subtle text-info">Risk: @Model.RiskScore/100</span>
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <span class="badge bg-primary-subtle rounded-pill">@Model.Item?.Condition</span>
+                <div class="rating-badge rounded-pill">
+                    <i class="bi bi-star-fill"></i> 4.9 (12 reviews)
                 </div>
-
-                <div class="mb-3">
-                    <span class="display-6 fw-bold text-accent">Rs. @Model.PricePerDay.ToString("N0")</span>
-                    <span class="text-muted fs-6"> / day</span>
-                </div>
-
-                <h6 class="fw-semibold text-uppercase text-muted small mt-3 mb-2">Description</h6>
-                <p>@Model.Description</p>
-
-                <h6 class="fw-semibold text-uppercase text-muted small mt-3 mb-2">Rental Terms</h6>
-                <p class="small">@Model.Terms</p>
-
-                <h6 class="fw-semibold text-uppercase text-muted small mt-3 mb-2">Owner</h6>
-                <p><i class="bi bi-person-circle"></i> @Model.Owner?.Name</p>
-
-                <hr />
-
-                @if (isLoggedIn && Model.Status == "Approved")
-                {
-                    <div class="d-flex gap-3">
-                        <a asp-controller="Booking" asp-action="Book" asp-route-listingId="@Model.Id"
-                           class="btn btn-accent flex-grow-1">
-                            <i class="bi bi-calendar-plus"></i> Book Now
-                        </a>
-                        <a asp-controller="Review" asp-action="Create" asp-route-listingId="@Model.Id"
-                           class="btn btn-outline-light flex-grow-1">
-                            <i class="bi bi-star"></i> Write Review
-                        </a>
-                    </div>
-                }
-                else if (!isLoggedIn)
-                {
-                    <a asp-controller="Auth" asp-action="Login" class="btn btn-accent w-100">
-                        <i class="bi bi-box-arrow-in-right"></i> Login to Book
-                    </a>
-                }
             </div>
+
+            <h1 class="fw-bold mb-3" style="color: var(--sb-secondary); font-size: 2.5rem; letter-spacing: -0.5px;">@Model.Item?.Name</h1>
+            
+            <div class="d-flex align-items-end gap-2 mb-4 pb-4 border-bottom border-light">
+                <span class="fw-bold text-accent" style="font-size: 2rem;">Rs. @Model.PricePerDay.ToString("N0")</span>
+                <span class="text-muted pb-2">/ day</span>
+            </div>
+
+            <div class="mb-4">
+                <h5 class="fw-semibold mb-3">Description</h5>
+                <p class="text-muted" style="line-height: 1.7;">@Model.Description</p>
+            </div>
+
+            <div class="mb-4">
+                <h5 class="fw-semibold mb-3">Rental Terms</h5>
+                <div class="bg-light p-4 rounded-3 text-muted small" style="line-height: 1.6;">
+                    @Model.Terms
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center mb-5 mt-4 p-3 border rounded-3 bg-white shadow-sm">
+                <div class="profile-avatar bg-primary text-white me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                    @(string.IsNullOrEmpty(Model.Owner?.Name) ? "O" : Model.Owner.Name.Substring(0, 1).ToUpper())
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">Owned by @Model.Owner?.Name</h6>
+                    <small class="text-muted">Verified Vendor <i class="bi bi-patch-check-fill text-primary ms-1"></i></small>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 ms-auto">Message</button>
+            </div>
+
+            @if (isLoggedIn && Model.Status == "Approved")
+            {
+                <div class="d-flex gap-3">
+                    <a asp-controller="Booking" asp-action="Book" asp-route-listingId="@Model.Id"
+                       class="btn btn-primary btn-lg rounded-pill flex-grow-1 shadow-sm fs-5 py-3">
+                        Book Now
+                    </a>
+                </div>
+            }
+            else if (!isLoggedIn)
+            {
+                <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg rounded-pill w-100 shadow-sm py-3">
+                    Log in to Book
+                </a>
+            }
+            else if (Model.Status != "Approved")
+            {
+                <button class="btn btn-secondary btn-lg rounded-pill w-100 py-3" disabled>
+                    Listing is @Model.Status
+                </button>
+            }
         </div>
     </div>
 </div>

@@ -1,94 +1,150 @@
 @model SmartBorrowLK.ViewModels.AdminDashboardViewModel
 @{ ViewData["Title"] = "Admin Dashboard"; }
 
-<div class="container mt-4">
-    <h2 class="mb-4">Platform Overview</h2>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: var(--sb-secondary);">Dashboard Overview</h2>
+            <p class="text-muted mb-0">Platform statistics and pending approvals</p>
+        </div>
+        <div>
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill">
+                <i class="bi bi-shield-lock me-1"></i> Admin Access
+            </span>
+        </div>
+    </div>
 
-    <div class="row mb-5 text-center">
+    <!-- Quick Stats -->
+    <div class="row g-4 mb-5">
         <div class="col-md-3">
-            <div class="card text-white bg-primary shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Total Listings</h5>
-                    <h2>@Model.TotalListings</h2>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Total Listings</div>
+                <div class="stat-value">@Model.TotalListings</div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-dark bg-warning shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Pending Review</h5>
-                    <h2>@Model.PendingListingsCount</h2>
-                </div>
+            <div class="stat-card border-top border-4 border-warning">
+                <div class="stat-title text-warning">Pending Review</div>
+                <div class="stat-value text-dark">@Model.PendingListingsCount</div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-white bg-success shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Approved</h5>
-                    <h2>@Model.ApprovedListingsCount</h2>
-                </div>
+            <div class="stat-card border-top border-4 border-success">
+                <div class="stat-title text-success">Approved</div>
+                <div class="stat-value text-dark">@Model.ApprovedListingsCount</div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-white bg-danger shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">High Risk (>70)</h5>
-                    <h2>@Model.HighRiskCount</h2>
-                </div>
+            <div class="stat-card border-top border-4 border-danger">
+                <div class="stat-title text-danger">Rejected</div>
+                <div class="stat-value text-dark">@Model.RejectedListingsCount</div>
             </div>
         </div>
     </div>
 
-    <h3 class="mb-3">Action Required: Pending Listings</h3>
-    
-    @if (!Model.PendingListings.Any())
-    {
-        <div class="alert alert-success">All caught up! There are no listings waiting for review.</div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Item</th>
-                        <th>Vendor</th>
-                        <th>AI Price/Day</th>
-                        <th>AI Risk Score</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var listing in Model.PendingListings)
-                    {
-                        <tr>
-                            <td>
-                                <img src="@listing.Item.ImageUrl" alt="@listing.Item.Name" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;" />
-                                <strong>@listing.Item.Name</strong>
-                                <br />
-                                <small class="text-muted">@listing.Description.Substring(0, Math.Min(50, listing.Description.Length))...</small>
-                            </td>
-                            <td>@listing.Owner.Name</td>
-                            <td>Rs. @listing.PricePerDay.ToString("N0")</td>
-                            <td>
-                                <span class="badge @(listing.RiskScore > 70 ? "bg-danger" : listing.RiskScore > 40 ? "bg-warning" : "bg-success")">
-                                    @listing.RiskScore / 100
-                                </span>
-                            </td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <form asp-action="Approve" asp-route-id="@listing.Id" method="post">
-                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
-                                    </form>
-                                    <form asp-action="Reject" asp-route-id="@listing.Id" method="post">
-                                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    <!-- Pending Listings Table -->
+    <div class="sb-card border-0 shadow-sm mb-5">
+        <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0">Action Required</h5>
+            <span class="badge bg-warning text-dark rounded-pill">@Model.PendingListings.Count Pending</span>
         </div>
-    }
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Item Details</th>
+                            <th>Vendor</th>
+                            <th>Price / Day</th>
+                            <th>AI Risk Score</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.PendingListings.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-check-circle display-4 text-success opacity-25 mb-3 d-block"></i>
+                                    All clear! No listings require review at the moment.
+                                </td>
+                            </tr>
+                        }
+                        @foreach (var listing in Model.PendingListings)
+                        {
+                            var riskClass = listing.RiskScore > 75 ? "danger" : (listing.RiskScore > 40 ? "warning" : "success");
+                            
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        @if (!string.IsNullOrEmpty(listing.Item?.ImageUrl))
+                                        {
+                                            <img src="@listing.Item.ImageUrl" alt="@listing.Item.Name" class="rounded rounded-3 me-3" style="width: 48px; height: 48px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="bg-light rounded rounded-3 me-3 d-flex align-items-center justify-content-center text-muted" style="width: 48px; height: 48px;">
+                                                <i class="bi bi-camera"></i>
+                                            </div>
+                                        }
+                                        <div>
+                                            <div class="fw-semibold text-dark">@listing.Item?.Name</div>
+                                            <div class="small text-muted">ID: #@(listing.Id) &bull; @listing.Item?.Condition</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@listing.Owner?.Name</td>
+                                <td class="fw-medium">Rs. @listing.PricePerDay.ToString("N0")</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 6px; width: 60px;">
+                                            <div class="progress-bar bg-@riskClass" role="progressbar" style="width: @listing.RiskScore%" aria-valuenow="@listing.RiskScore" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <span class="badge bg-@riskClass-subtle">@listing.RiskScore/100</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if(listing.Status == "Pending")
+                                    {
+                                        <span class="badge bg-warning-subtle text-dark"><i class="bi bi-hourglass me-1"></i> Pending</span>
+                                    }
+                                    else if(listing.Status == "Approved")
+                                    {
+                                        <span class="badge bg-success-subtle"><i class="bi bi-check me-1"></i> Approved</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger-subtle"><i class="bi bi-x me-1"></i> Rejected</span>
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    @if (listing.Status == "Pending")
+                                    {
+                                        <div class="btn-group">
+                                            <form asp-action="Approve" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@listing.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-check-lg"></i> Approve
+                                                </button>
+                                            </form>
+                                            <form asp-action="Reject" method="post" class="d-inline ms-1">
+                                                <input type="hidden" name="id" value="@listing.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-x-lg"></i> Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                    <a asp-controller="Listing" asp-action="Details" asp-route-id="@listing.Id" class="btn btn-sm btn-light ms-2">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
