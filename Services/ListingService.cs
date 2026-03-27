@@ -41,17 +41,55 @@ namespace SmartBorrowLK.Services
             var imageUrl = await _cloudinary.UploadImageAsync(model.Image);
             if (string.IsNullOrEmpty(imageUrl)) return null;
 
-            // 2. Call Gemini AI to generate details
+            // 2. Try to call Gemini AI to generate details
+            string aiDescription = model.RawDescription;
+            decimal pricePerDay = model.ManualPrice ?? 0;
+            string terms = "Standard rental terms apply. Item must be returned in the same condition.";
+            
             var aiResponse = await _aiService.GenerateListingDetailsAsync(model.RawDescription);
             
-            // Clean markdown formatting if Gemini includes it (e.g., ```json ... ```)
-            var cleanJson = aiResponse.Replace("```json", "").Replace("```", "").Trim();
-            var aiData = JsonSerializer.Deserialize<AIGeneratedData>(cleanJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (!string.IsNullOrEmpty(aiResponse))
+            {
+                try
+                {
+                    // Clean markdown formatting if Gemini includes it (e.g., ```json ... ```)
+                    var cleanJson = aiResponse.Replace("```json", "").Replace("```", "").Trim();
+                    var aiData = JsonSerializer.Deserialize<AIGeneratedData>(cleanJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            if (aiData == null) return null;
+                    if (aiData != null)
+                    {
+                        aiDescription = aiData.Description;
+                        terms = aiData.Terms;
+                        // Use manual price if provided, otherwise use AI price
+                        if (!model.ManualPrice.HasValue || model.ManualPrice.Value <= 0)
+                        {
+                            pricePerDay = aiData.PricePerDay;
+                        }
+                    }
+                }
+                catch (JsonException ex)
+                {
+                    Console.WriteLine($"Failed to parse AI response: {ex.Message}");
+                    // Continue with manual/default values
+                }
+            }
 
-            // 3. Call Gemini AI for Risk Analysis
-            var riskScore = await _aiService.CalculateRiskScoreAsync(aiData.Description, aiData.PricePerDay);
+            // Ensure we have a valid price
+            if (pricePerDay <= 0)
+            {
+                pricePerDay = model.ManualPrice ?? 500; // Default fallback
+            }
+
+            // 3. Try to get AI risk score (with fallback)
+            int riskScore = 0;
+            try
+            {
+                riskScore = await _aiService.CalculateRiskScoreAsync(aiDescription, pricePerDay);
+            }
+            catch
+            {
+                riskScore = 25; // Default low-risk score if AI fails
+            }
 
             // 4. Save to Database (PostgreSQL via Neon)
             var item = new Item
@@ -69,9 +107,9 @@ namespace SmartBorrowLK.Services
             {
                 ItemId = item.Id,
                 OwnerId = userId,
-                PricePerDay = aiData.PricePerDay,
-                Description = aiData.Description,
-                Terms = aiData.Terms,
+                PricePerDay = pricePerDay,
+                Description = aiDescription,
+                Terms = terms,
                 RiskScore = riskScore,
                 // If risk is too high, auto-reject. Otherwise, pending admin approval.
                 Status = riskScore > 80 ? "Rejected" : "Pending" 

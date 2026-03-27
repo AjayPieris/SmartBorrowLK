@@ -1,43 +1,83 @@
 @model SmartBorrowLK.Models.Listing
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Item?.Name ?? "Listing Details";
+    var isLoggedIn = Context.Session.GetInt32("UserId") != null;
 }
 
-<h1>Listing Details</h1>
+<div class="container py-4">
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left"></i> Back to Marketplace
+    </a>
 
-<div>
-    <h4>Listing</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Title</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Title)</dd>
+    <div class="row g-4">
+        <!-- Image Column -->
+        <div class="col-lg-6">
+            <div class="card sb-card overflow-hidden">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.Item?.Name" class="img-fluid" style="max-height: 450px; object-fit: cover; width: 100%;" />
+                }
+                else if (!string.IsNullOrEmpty(Model.Item?.ImageUrl))
+                {
+                    <img src="@Model.Item.ImageUrl" alt="@Model.Item.Name" class="img-fluid" style="max-height: 450px; object-fit: cover; width: 100%;" />
+                }
+                else
+                {
+                    <div class="bg-dark d-flex align-items-center justify-content-center" style="height: 350px;">
+                        <i class="bi bi-image display-1 text-muted"></i>
+                    </div>
+                }
+            </div>
+        </div>
 
-        <dt class="col-sm-2">Description</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Description)</dd>
+        <!-- Details Column -->
+        <div class="col-lg-6">
+            <div class="card sb-card p-4">
+                <span class="badge bg-success-subtle text-success mb-2 align-self-start">
+                    <i class="bi bi-check-circle"></i> @Model.Status
+                </span>
+                <h2 class="fw-bold mb-1">@Model.Item?.Name</h2>
+                <div class="d-flex gap-2 mb-3">
+                    <span class="badge bg-secondary-subtle text-secondary">@Model.Item?.Condition</span>
+                    <span class="badge bg-info-subtle text-info">Risk: @Model.RiskScore/100</span>
+                </div>
 
-        <dt class="col-sm-2">Price</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Price)</dd>
+                <div class="mb-3">
+                    <span class="display-6 fw-bold text-accent">Rs. @Model.PricePerDay.ToString("N0")</span>
+                    <span class="text-muted fs-6"> / day</span>
+                </div>
 
-        <dt class="col-sm-2">Location</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Location)</dd>
+                <h6 class="fw-semibold text-uppercase text-muted small mt-3 mb-2">Description</h6>
+                <p>@Model.Description</p>
 
-        <dt class="col-sm-2">Category</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Category)</dd>
+                <h6 class="fw-semibold text-uppercase text-muted small mt-3 mb-2">Rental Terms</h6>
+                <p class="small">@Model.Terms</p>
 
-        <dt class="col-sm-2">Condition</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Condition)</dd>
+                <h6 class="fw-semibold text-uppercase text-muted small mt-3 mb-2">Owner</h6>
+                <p><i class="bi bi-person-circle"></i> @Model.Owner?.Name</p>
 
-        <dt class="col-sm-2">Status</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
-        
-        @if (Model.ImageUrl != null)
-        {
-            <dt class="col-sm-2">Image</dt>
-            <dd class="col-sm-10"><img src="@Model.ImageUrl" alt="Listing Image" style="max-width: 300px;" /></dd>
-        }
-    </dl>
-</div>
-<div>
-    <a asp-action="Index">Back to List</a>
+                <hr />
+
+                @if (isLoggedIn && Model.Status == "Approved")
+                {
+                    <div class="d-flex gap-3">
+                        <a asp-controller="Booking" asp-action="Book" asp-route-listingId="@Model.Id"
+                           class="btn btn-accent flex-grow-1">
+                            <i class="bi bi-calendar-plus"></i> Book Now
+                        </a>
+                        <a asp-controller="Review" asp-action="Create" asp-route-listingId="@Model.Id"
+                           class="btn btn-outline-light flex-grow-1">
+                            <i class="bi bi-star"></i> Write Review
+                        </a>
+                    </div>
+                }
+                else if (!isLoggedIn)
+                {
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-accent w-100">
+                        <i class="bi bi-box-arrow-in-right"></i> Login to Book
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
 </div>

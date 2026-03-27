@@ -1,53 +1,72 @@
 @model SmartBorrowLK.ViewModels.CreateListingViewModel
 @{ ViewData["Title"] = "Create Listing"; }
 
-<div class="container mt-4">
-    <h2>Rent out your gear</h2>
-    <p class="text-muted">Tell us a bit about your item, and our AI will generate a professional listing with pricing and terms.</p>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="fw-bold mb-1"><i class="bi bi-plus-circle"></i> List Your Gear</h2>
+            <p class="text-muted mb-4">Tell us about your item. Our AI will generate a professional description and rental terms. You can set your own price or let AI suggest one.</p>
 
-    <div class="row">
-        <div class="col-md-8">
-            <form asp-action="Create" method="post" enctype="multipart/form-data" id="createForm">
-                <div class="mb-3">
-                    <label asp-for="ItemName" class="form-label"></label>
-                    <input asp-for="ItemName" class="form-control" placeholder="e.g., DJI Mini 3 Pro" />
-                    <span asp-validation-for="ItemName" class="text-danger"></span>
+            <div class="card sb-card">
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" id="createForm">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="ItemName" class="form-label"></label>
+                            <input asp-for="ItemName" class="form-control" placeholder="e.g., DJI Mini 3 Pro Drone" />
+                            <span asp-validation-for="ItemName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Condition" class="form-label"></label>
+                            <select asp-for="Condition" class="form-select">
+                                <option value="Brand New">Brand New</option>
+                                <option value="Like New">Like New</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RawDescription" class="form-label"></label>
+                            <textarea asp-for="RawDescription" class="form-control" rows="3"
+                                      placeholder="e.g., Sony A7III mirrorless camera, bought last year, used twice. Comes with 2 batteries and a hard case."></textarea>
+                            <span asp-validation-for="RawDescription" class="text-danger"></span>
+                            <small class="text-muted d-block mt-1"><i class="bi bi-stars"></i> AI will generate a professional description, terms, and risk score from this.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ManualPrice" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: var(--sb-bg); border-color: var(--sb-border); color: var(--sb-text-muted);">Rs.</span>
+                                <input asp-for="ManualPrice" class="form-control" type="number" step="50" min="0"
+                                       placeholder="e.g., 2500 (leave blank for AI suggestion)" />
+                            </div>
+                            <span asp-validation-for="ManualPrice" class="text-danger"></span>
+                            <small class="text-muted d-block mt-1"><i class="bi bi-info-circle"></i> If left blank, AI will suggest a price based on the item description.</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Image" class="form-label"></label>
+                            <input asp-for="Image" type="file" class="form-control" accept="image/*" />
+                            <span asp-validation-for="Image" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-accent w-100 py-2" id="submitBtn">
+                            <span id="btnText"><i class="bi bi-stars"></i> Generate Listing with AI</span>
+                            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                        </button>
+                    </form>
                 </div>
-
-                <div class="mb-3">
-                    <label asp-for="Condition" class="form-label"></label>
-                    <select asp-for="Condition" class="form-select">
-                        <option value="Brand New">Brand New</option>
-                        <option value="Like New">Like New</option>
-                        <option value="Good">Good</option>
-                        <option value="Fair">Fair</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="RawDescription" class="form-label"></label>
-                    <textarea asp-for="RawDescription" class="form-control" rows="3" placeholder="e.g., Bought last year, used twice. Comes with 2 batteries and a hard case."></textarea>
-                    <span asp-validation-for="RawDescription" class="text-danger"></span>
-                </div>
-
-                <div class="mb-4">
-                    <label asp-for="Image" class="form-label"></label>
-                    <input asp-for="Image" type="file" class="form-control" accept="image/*" />
-                </div>
-
-                <button type="submit" class="btn btn-primary" id="submitBtn">
-                    <span id="btnText">Generate Listing with AI ✨</span>
-                    <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                </button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Simple script to show a loading spinner since AI generation takes a few seconds
     document.getElementById('createForm').addEventListener('submit', function() {
-        document.getElementById('btnText').innerText = 'Generating (this takes a few seconds)...';
+        document.getElementById('btnText').innerHTML = '<i class="bi bi-hourglass-split"></i> Generating (this takes a few seconds)...';
         document.getElementById('btnSpinner').classList.remove('d-none');
         document.getElementById('submitBtn').disabled = true;
     });

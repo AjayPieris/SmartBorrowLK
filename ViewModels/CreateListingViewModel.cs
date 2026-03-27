@@ -17,6 +17,10 @@ namespace SmartBorrowLK.ViewModels
         [Display(Name = "Brief Description for AI")]
         public string RawDescription { get; set; } = string.Empty;
 
+        [Display(Name = "Your Price Per Day (LKR) — leave blank for AI pricing")]
+        [Range(0, 1000000, ErrorMessage = "Price must be a positive number")]
+        public decimal? ManualPrice { get; set; }
+
         [Required]
         [Display(Name = "Item Image")]
         public IFormFile Image { get; set; } = null!;

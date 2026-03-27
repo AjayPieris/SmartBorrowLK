@@ -27,25 +27,33 @@ namespace SmartBorrowLK.Services
 
         private async Task<string> CallGeminiApiAsync(string prompt)
         {
-            var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={_apiKey}";
+            var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={_apiKey}";
 
             var requestBody = new
             {
                 contents = new[] { new { parts = new[] { new { text = prompt } } } }
             };
 
-            var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
 
-            var responseString = await response.Content.ReadAsStringAsync();
-            using var document = JsonDocument.Parse(responseString);
+                var responseString = await response.Content.ReadAsStringAsync();
+                using var document = JsonDocument.Parse(responseString);
 
-            return document.RootElement
-                .GetProperty("candidates")[0]
-                .GetProperty("content")
-                .GetProperty("parts")[0]
-                .GetProperty("text").GetString() ?? string.Empty;
+                return document.RootElement
+                    .GetProperty("candidates")[0]
+                    .GetProperty("content")
+                    .GetProperty("parts")[0]
+                    .GetProperty("text").GetString() ?? string.Empty;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Gemini API error: {ex.Message}");
+                return string.Empty;
+            }
         }
 
         public async Task<string> GenerateListingDetailsAsync(string inputText)

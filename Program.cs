@@ -27,6 +27,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register Custom Services
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IListingService, ListingService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddHttpClient<IAIService, GeminiAIService>();
 
 var app = builder.Build();
