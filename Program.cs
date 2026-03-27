@@ -4,6 +4,10 @@ using SmartBorrowLK.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load the .env file
+DotNetEnv.Env.Load();
+builder.Configuration.AddEnvironmentVariables();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
