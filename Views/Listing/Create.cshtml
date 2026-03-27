@@ -1,0 +1,54 @@
+@model SmartBorrowLK.ViewModels.CreateListingViewModel
+@{ ViewData["Title"] = "Create Listing"; }
+
+<div class="container mt-4">
+    <h2>Rent out your gear</h2>
+    <p class="text-muted">Tell us a bit about your item, and our AI will generate a professional listing with pricing and terms.</p>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Create" method="post" enctype="multipart/form-data" id="createForm">
+                <div class="mb-3">
+                    <label asp-for="ItemName" class="form-label"></label>
+                    <input asp-for="ItemName" class="form-control" placeholder="e.g., DJI Mini 3 Pro" />
+                    <span asp-validation-for="ItemName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Condition" class="form-label"></label>
+                    <select asp-for="Condition" class="form-select">
+                        <option value="Brand New">Brand New</option>
+                        <option value="Like New">Like New</option>
+                        <option value="Good">Good</option>
+                        <option value="Fair">Fair</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RawDescription" class="form-label"></label>
+                    <textarea asp-for="RawDescription" class="form-control" rows="3" placeholder="e.g., Bought last year, used twice. Comes with 2 batteries and a hard case."></textarea>
+                    <span asp-validation-for="RawDescription" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Image" class="form-label"></label>
+                    <input asp-for="Image" type="file" class="form-control" accept="image/*" />
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <span id="btnText">Generate Listing with AI ✨</span>
+                    <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simple script to show a loading spinner since AI generation takes a few seconds
+    document.getElementById('createForm').addEventListener('submit', function() {
+        document.getElementById('btnText').innerText = 'Generating (this takes a few seconds)...';
+        document.getElementById('btnSpinner').classList.remove('d-none');
+        document.getElementById('submitBtn').disabled = true;
+    });
+</script>
