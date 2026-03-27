@@ -16,7 +16,8 @@ namespace SmartBorrowLK.Controllers
         // Simple custom security check
         private bool IsAdmin()
         {
-            return HttpContext.Session.GetString("UserRole") == "Admin";
+            var role = HttpContext.Session.GetString("UserRole");
+            return string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase);
         }
 
         public async Task<IActionResult> Dashboard()
@@ -31,7 +32,7 @@ namespace SmartBorrowLK.Controllers
         public async Task<IActionResult> Approve(int id)
         {
             if (!IsAdmin()) return Unauthorized();
-            
+
             await _adminService.ApproveListingAsync(id);
             return RedirectToAction("Dashboard");
         }
@@ -40,7 +41,7 @@ namespace SmartBorrowLK.Controllers
         public async Task<IActionResult> Reject(int id)
         {
             if (!IsAdmin()) return Unauthorized();
-            
+
             await _adminService.RejectListingAsync(id);
             return RedirectToAction("Dashboard");
         }

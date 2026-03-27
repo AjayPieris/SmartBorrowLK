@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using SmartBorrowLK.Data;
 using SmartBorrowLK.Services;
@@ -11,7 +12,16 @@ builder.Configuration.AddEnvironmentVariables();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add Session for Authentication
+// Add Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.LogoutPath = "/Auth/Logout";
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    });
+
+// Add Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -47,7 +57,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession(); // Must be before Authorization
+app.UseAuthentication();
+app.UseSession(); // Session still available if needed before or after Auth, but Auth first
 app.UseAuthorization();
 
 app.MapControllerRoute(

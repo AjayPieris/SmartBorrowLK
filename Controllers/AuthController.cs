@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using SmartBorrowLK.Models;
 using SmartBorrowLK.Services;
 using SmartBorrowLK.ViewModels;
+using System.Security.Claims;
 
 namespace SmartBorrowLK.Controllers
 {
@@ -29,7 +33,7 @@ namespace SmartBorrowLK.Controllers
             }
 
             // Auto-login after registration
-            SetUserSession(user.Id, user.Role, user.Name);
+            await SignInUser(user);
             return RedirectToAction("Index", "Home");
         }
 
@@ -48,21 +52,43 @@ namespace SmartBorrowLK.Controllers
                 return View(model);
             }
 
-            SetUserSession(user.Id, user.Role, user.Name);
+            await SignInUser(user);
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.Session.Clear();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear(); // Just in case
             return RedirectToAction("Login");
         }
 
-        private void SetUserSession(int id, string role, string name)
+        private async Task SignInUser(User user)
         {
-            HttpContext.Session.SetInt32("UserId", id);
-            HttpContext.Session.SetString("UserRole", role);
-            HttpContext.Session.SetString("UserName", name);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+
+            if (!string.IsNullOrEmpty(user.ProfileImageUrl))
+            {
+                claims.Add(new Claim("ProfileImage", user.ProfileImageUrl));
+            }
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30)
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
         }
     }
 }

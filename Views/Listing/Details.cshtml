@@ -1,7 +1,7 @@
 @model SmartBorrowLK.Models.Listing
 @{
     ViewData["Title"] = Model.Item?.Name ?? "Listing Details";
-    var isLoggedIn = Context.Session.GetInt32("UserId") != null;
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
 }
 
 <div class="container py-5">
@@ -23,7 +23,8 @@
                 }
                 else
                 {
-                    <div class="detail-image d-flex align-items-center justify-content-center border" style="height: 400px;">
+                    <div class="detail-image d-flex align-items-center justify-content-center border"
+                         style="height: 400px;">
                         <i class="bi bi-camera display-1 text-muted opacity-25"></i>
                     </div>
                 }
@@ -39,57 +40,61 @@
                 </div>
             </div>
 
-            <h1 class="fw-bold mb-3" style="color: var(--sb-secondary); font-size: 2.5rem; letter-spacing: -0.5px;">@Model.Item?.Name</h1>
+            <h1 class="fw-bold mb-3" style="color: var(--sb-secondary); font-size: 2.5rem; letter-spacing: -0.5px;">
+                @Model.Item?.Name</h1>
             
-            <div class="d-flex align-items-end gap-2 mb-4 pb-4 border-bottom border-light">
-                <span class="fw-bold text-accent" style="font-size: 2rem;">Rs. @Model.PricePerDay.ToString("N0")</span>
-                <span class="text-muted pb-2">/ day</span>
-            </div>
+                <div class="d-flex align-items-end gap-2 mb-4 pb-4 border-bottom border-light">
+                    <span class="fw-bold text-accent" style="font-size: 2rem;">Rs. @Model.PricePerDay.ToString("N0")</span>
+                    <span class="text-muted pb-2">/ day</span>
+                </div>
 
-            <div class="mb-4">
-                <h5 class="fw-semibold mb-3">Description</h5>
-                <p class="text-muted" style="line-height: 1.7;">@Model.Description</p>
-            </div>
+                <div class="mb-4">
+                    <h5 class="fw-semibold mb-3">Description</h5>
+                    <p class="text-muted" style="line-height: 1.7;">@Model.Description</p>
+                </div>
 
-            <div class="mb-4">
-                <h5 class="fw-semibold mb-3">Rental Terms</h5>
-                <div class="bg-light p-4 rounded-3 text-muted small" style="line-height: 1.6;">
-                    @Model.Terms
+                <div class="mb-4">
+                    <h5 class="fw-semibold mb-3">Rental Terms</h5>
+                    <div class="bg-light p-4 rounded-3 text-muted small" style="line-height: 1.6;">
+                        @Model.Terms
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center mb-5 mt-4 p-3 border rounded-3 bg-white shadow-sm">
+                    <div class="profile-avatar bg-primary text-white me-3"
+                         style="width: 50px; height: 50px; font-size: 1.2rem;">
+                        @(string.IsNullOrEmpty(Model.Owner?.Name) ? "O" : Model.Owner.Name.Substring(0, 1).ToUpper())
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">Owned by @Model.Owner?.Name</h6>
+                        <small class="text-muted">Verified Vendor <i
+                            class="bi bi-patch-check-fill text-primary ms-1"></i></small>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 ms-auto">Message</button>
+                    </div>
+
+                    @if (isLoggedIn && Model.Status == "Approved")
+                    {
+                        <div class="d-flex gap-3">
+                            <a asp-controller="Booking" asp-action="Book" asp-route-listingId="@Model.Id"
+                                   class="btn btn-primary btn-lg rounded-pill flex-grow-1 shadow-sm fs-5 py-3">
+                                Book Now
+                            </a>
+                        </div>
+                    }
+                    else if (!isLoggedIn)
+                    {
+                        <a asp-controller="Auth" asp-action="Login"
+                               class="btn btn-primary btn-lg rounded-pill w-100 shadow-sm py-3">
+                            Log in to Book
+                        </a>
+                    }
+                    else if (Model.Status != "Approved")
+                    {
+                        <button class="btn btn-secondary btn-lg rounded-pill w-100 py-3" disabled>
+                            Listing is @Model.Status
+                        </button>
+                    }
                 </div>
             </div>
-
-            <div class="d-flex align-items-center mb-5 mt-4 p-3 border rounded-3 bg-white shadow-sm">
-                <div class="profile-avatar bg-primary text-white me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
-                    @(string.IsNullOrEmpty(Model.Owner?.Name) ? "O" : Model.Owner.Name.Substring(0, 1).ToUpper())
-                </div>
-                <div>
-                    <h6 class="mb-0 fw-bold">Owned by @Model.Owner?.Name</h6>
-                    <small class="text-muted">Verified Vendor <i class="bi bi-patch-check-fill text-primary ms-1"></i></small>
-                </div>
-                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 ms-auto">Message</button>
-            </div>
-
-            @if (isLoggedIn && Model.Status == "Approved")
-            {
-                <div class="d-flex gap-3">
-                    <a asp-controller="Booking" asp-action="Book" asp-route-listingId="@Model.Id"
-                       class="btn btn-primary btn-lg rounded-pill flex-grow-1 shadow-sm fs-5 py-3">
-                        Book Now
-                    </a>
-                </div>
-            }
-            else if (!isLoggedIn)
-            {
-                <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg rounded-pill w-100 shadow-sm py-3">
-                    Log in to Book
-                </a>
-            }
-            else if (Model.Status != "Approved")
-            {
-                <button class="btn btn-secondary btn-lg rounded-pill w-100 py-3" disabled>
-                    Listing is @Model.Status
-                </button>
-            }
         </div>
-    </div>
-</div>

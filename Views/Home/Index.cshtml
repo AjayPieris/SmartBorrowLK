@@ -1,4 +1,6 @@
-@{ ViewData["Title"] = "Home Page"; }
+@{
+    ViewData["Title"] = "Home Page";
+}
 
 <!-- Hero Section -->
 <section class="sb-hero text-center position-relative overflow-hidden">
@@ -10,23 +12,28 @@
                 </span>
                 <h1 class="hero-title">Rent Smart. Earn Easy.</h1>
                 <p class="hero-subtitle">
-                    AI-powered tech rental platform in Sri Lanka. Borrow top-tier cameras, laptops, drones, 
+                    AI-powered tech rental platform in Sri Lanka. Borrow top-tier cameras, laptops, drones,
                     and gear instantly. Or list your idle tech to earn passive income.
                 </p>
                 
                 <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
-                    <a asp-controller="Listing" asp-action="Index" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">
+                    <a asp-controller="Listing" asp-action="Index"
+                           class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">
                         <i class="bi bi-search me-2"></i> Browse Items
                     </a>
-                    @if (Context.Session.GetString("UserRole") == "Vendor")
+                    @if (User.Claims.FirstOrDefault(c => c.Type ==
+                                        System.Security.Claims.ClaimTypes.Role)?.Value?.Equals("Vendor", StringComparison.OrdinalIgnoreCase)
+                                        == true)
                     {
-                        <a asp-controller="Listing" asp-action="Create" class="btn btn-outline-primary btn-lg rounded-pill px-5">
+                        <a asp-controller="Listing" asp-action="Create"
+                               class="btn btn-outline-primary btn-lg rounded-pill px-5">
                             <i class="bi bi-plus-circle me-2"></i> List Your Item
                         </a>
                     }
-                    else if (Context.Session.GetString("UserRole") == null)
+                    else if (User.Identity?.IsAuthenticated != true)
                     {
-                        <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-primary btn-lg rounded-pill px-5">
+                        <a asp-controller="Auth" asp-action="Register"
+                               class="btn btn-outline-primary btn-lg rounded-pill px-5">
                             <i class="bi bi-person-plus me-2"></i> Become a Vendor
                         </a>
                     }
@@ -47,47 +54,55 @@
         <div class="row g-4 text-center">
             <div class="col-md-4">
                 <div class="sb-card p-5 h-100 border-0">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-4" style="width: 80px; height: 80px; font-size: 2rem;">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-4"
+                         style="width: 80px; height: 80px; font-size: 2rem;">
                         <i class="bi bi-magic"></i>
                     </div>
                     <h4 class="fw-semibold">AI Auto-Listings</h4>
-                    <p class="text-muted">Vendors just type a single sentence. Our AI instantly generates professional descriptions and rental prices.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="sb-card p-5 h-100 border-0">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-4" style="width: 80px; height: 80px; font-size: 2rem;">
-                        <i class="bi bi-shield-check"></i>
+                    <p class="text-muted">Vendors just type a single sentence. Our AI instantly generates professional
+                        descriptions and rental prices.</p>
                     </div>
-                    <h4 class="fw-semibold">Smart Risk Scoring</h4>
-                    <p class="text-muted">Every item goes through AI risk evaluation. High-value, high-risk items are securely reviewed before going live.</p>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="sb-card p-5 h-100 border-0">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-warning-subtle text-warning rounded-circle mb-4" style="width: 80px; height: 80px; font-size: 2rem;">
-                        <i class="bi bi-calendar-event"></i>
+                <div class="col-md-4">
+                    <div class="sb-card p-5 h-100 border-0">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-4"
+                             style="width: 80px; height: 80px; font-size: 2rem;">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h4 class="fw-semibold">Smart Risk Scoring</h4>
+                        <p class="text-muted">Every item goes through AI risk evaluation. High-value, high-risk items are
+                            securely reviewed before going live.</p>
+                        </div>
                     </div>
-                    <h4 class="fw-semibold">Easy Booking</h4>
-                    <p class="text-muted">Find exactly what you need, book it for specific dates seamlessly, and leave a review once returned.</p>
+                    <div class="col-md-4">
+                        <div class="sb-card p-5 h-100 border-0">
+                            <div class="d-inline-flex align-items-center justify-content-center bg-warning-subtle text-warning rounded-circle mb-4"
+                                 style="width: 80px; height: 80px; font-size: 2rem;">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                            <h4 class="fw-semibold">Easy Booking</h4>
+                            <p class="text-muted">Find exactly what you need, book it for specific dates seamlessly, and leave a
+                                review once returned.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
+            </section>
 
-<!-- Call to Action -->
-<section class="py-5 bg-white border-top border-bottom border-light">
-    <div class="container py-4 text-center">
-        <h2 class="fw-bold mb-3">Ready to transform your unused tech into cash?</h2>
-        <p class="text-muted mb-4">Join hundreds of vendors earning daily on SmartBorrow LK.</p>
-        @if (Context.Session.GetString("UserRole") == "Vendor")
-        {
-            <a asp-controller="Listing" asp-action="Create" class="btn btn-accent btn-lg px-5 rounded-pill shadow-sm">Start Earning Today</a>
-        }
+            <!-- Call to Action -->
+            <section class="py-5 bg-white border-top border-bottom border-light">
+                <div class="container py-4 text-center">
+                    <h2 class="fw-bold mb-3">Ready to transform your unused tech into cash?</h2>
+                    <p class="text-muted mb-4">Join hundreds of vendors earning daily on SmartBorrow LK.</p>
+                    @if (User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value?.Equals("Vendor", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        <a asp-controller="Listing" asp-action="Create" class="btn btn-accent btn-lg px-5 rounded-pill shadow-sm">Start
+                            Earning Today</a>
+                        }
         else
-        {
-            <a asp-controller="Auth" asp-action="Register" class="btn btn-accent btn-lg px-5 rounded-pill shadow-sm">Create an Account</a>
-        }
-    </div>
-</section>
+                        {
+                            <a asp-controller="Auth" asp-action="Register" class="btn btn-accent btn-lg px-5 rounded-pill shadow-sm">Create
+                                an Account</a>
+                            }
+                        </div>
+                    </section>
