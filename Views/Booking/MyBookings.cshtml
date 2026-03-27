@@ -1,0 +1,72 @@
+@model IEnumerable<SmartBorrowLK.Models.Booking>
+@{ ViewData["Title"] = "My Bookings"; }
+
+<div class="container mt-4">
+    <h2 class="mb-4">My Rentals</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">You haven't booked anything yet. Head to the <a asp-controller="Listing" asp-action="Index">Marketplace</a> to find gear!</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Item</th>
+                        <th>Dates</th>
+                        <th>Duration</th>
+                        <th>Total Cost</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in Model)
+                    {
+                        var days = (booking.EndDate - booking.StartDate).Days;
+                        var totalCost = days * booking.Listing.PricePerDay;
+                        var isPast = booking.EndDate < DateTime.UtcNow;
+
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="@booking.Listing.Item.ImageUrl" alt="@booking.Listing.Item.Name" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 15px;" />
+                                    <strong>@booking.Listing.Item.Name</strong>
+                                </div>
+                            </td>
+                            <td>
+                                @booking.StartDate.ToString("MMM dd, yyyy") - <br/>
+                                @booking.EndDate.ToString("MMM dd, yyyy")
+                            </td>
+                            <td>@days Days</td>
+                            <td>Rs. @totalCost.ToString("N0")</td>
+                            <td>
+                                @if (isPast)
+                                {
+                                    <span class="badge bg-secondary">Completed</span>
+                                    }
+                                else if (booking.StartDate > DateTime.UtcNow)
+                                {
+                                    <span class="badge bg-primary">Upcoming</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Active Now</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
