@@ -1,0 +1,43 @@
+@model IEnumerable<SmartBorrowLK.Models.Listing>
+@{ ViewData["Title"] = "My Listings"; }
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Listings</h2>
+        <a asp-action="Create" class="btn btn-success">+ New Listing</a>
+    </div>
+
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Image</th>
+                <th>Item</th>
+                <th>AI Suggested Price/Day</th>
+                <th>Risk Score</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@item.Item.ImageUrl" alt="@item.Item.Name" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" />
+                    </td>
+                    <td>@item.Item.Name</td>
+                    <td>Rs. @item.PricePerDay.ToString("N0")</td>
+                    <td>
+                        <span class="badge @(item.RiskScore < 30 ? "bg-success" : item.RiskScore < 70 ? "bg-warning" : "bg-danger")">
+                            @item.RiskScore / 100
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge @(item.Status == "Approved" ? "bg-success" : item.Status == "Pending" ? "bg-secondary" : "bg-danger")">
+                            @item.Status
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
