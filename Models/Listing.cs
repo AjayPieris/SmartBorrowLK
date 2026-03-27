@@ -14,6 +14,12 @@ namespace SmartBorrowLK.Models
         public string Terms { get; set; } = string.Empty; // AI Generated
         public int RiskScore { get; set; } // AI Generated (0-100)
         public string Status { get; set; } = "Pending"; // Pending, Approved, Rejected
+        public string Title { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public string Location { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public string Condition { get; set; } = string.Empty;
+        public string? ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
