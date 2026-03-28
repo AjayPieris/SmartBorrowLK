@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = Model.Item?.Name ?? "Listing Details";
     var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var reviewCount = Model.Reviews?.Count ?? 0;
+    var averageRating = reviewCount > 0 ? Model.Reviews!.Average(r => r.Rating) : 0;
 }
 
 <div class="container py-5">
@@ -23,7 +25,8 @@
                 }
                 else
                 {
-                    <div class="detail-image d-flex align-items-center justify-content-center" style="height: 400px; background: var(--sb-surface);">
+                    <div class="detail-image d-flex align-items-center justify-content-center"
+                         style="height: 400px; background: var(--sb-surface);">
                         <i class="bi bi-camera" style="font-size: 3rem; color: var(--sb-text-dim); opacity: 0.3;"></i>
                     </div>
                 }
@@ -33,9 +36,12 @@
         <!-- Details Column -->
         <div class="col-lg-6">
             <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge" style="background: rgba(129,236,255,0.1); color: var(--sb-primary);">@Model.Item?.Condition</span>
+                <span class="badge"
+                      style="background: rgba(129,236,255,0.1); color: var(--sb-primary);">@Model.Item?.Condition</span>
                 <div class="rating-badge">
-                    <i class="bi bi-star-fill"></i> 4.9 (12 reviews)
+                    <i class="bi bi-star-fill"></i>
+                    @(reviewCount > 0 ? $"{averageRating:F1} ({reviewCount} review{(reviewCount > 1 ? "s" :
+                    string.Empty)})" : "No reviews yet")
                 </div>
             </div>
 
@@ -59,10 +65,12 @@
             </div>
 
             <div class="d-flex align-items-center mb-4 p-3 glass-panel">
-                <div class="profile-avatar me-3" style="width: 48px; height: 48px; font-size: 1.1rem; overflow: hidden;">
+                <div class="profile-avatar me-3"
+                     style="width: 48px; height: 48px; font-size: 1.1rem; overflow: hidden;">
                     @if (!string.IsNullOrEmpty(Model.Owner?.ProfileImageUrl))
                     {
-                        <img src="@Model.Owner.ProfileImageUrl" alt="@Model.Owner.Name" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />
+                        <img src="@Model.Owner.ProfileImageUrl" alt="@Model.Owner.Name"
+                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />
                     }
                     else
                     {
@@ -71,40 +79,72 @@
                 </div>
                 <div>
                     <h6 class="mb-0 fw-bold">Owned by @Model.Owner?.Name</h6>
-                    <small style="color: var(--sb-text-muted);">Verified Vendor <i class="bi bi-patch-check-fill ms-1" style="color: var(--sb-primary);"></i></small>
+                    <small style="color: var(--sb-text-muted);">Verified Vendor <i class="bi bi-patch-check-fill ms-1"
+                                                                                       style="color: var(--sb-primary);"></i></small>
+                    </div>
                 </div>
-            </div>
 
-            @if (isLoggedIn && Model.Status == "Approved")
-            {
-                <a asp-controller="Booking" asp-action="Book" asp-route-listingId="@Model.Id"
-                   class="btn btn-primary btn-lg w-100 py-3 rounded-3 fw-bold" style="font-size: 1.1rem;">
-                    <i class="bi bi-calendar-check me-2"></i>Book Now
-                </a>
-                
-                @if (Model.OwnerId != int.Parse(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"))
+                @if (isLoggedIn && Model.Status == "Approved")
                 {
-                    <button type="button" class="btn btn-outline-secondary btn-lg w-100 py-3 mt-3 rounded-3 fw-bold open-chat-btn"
-                            data-owner-id="@Model.OwnerId" 
-                            data-owner-name="@Model.Owner?.Name"
-                            style="font-size: 1.1rem;">
-                        <i class="bi bi-chat-dots me-2"></i>Contact Seller
+                    <a asp-controller="Booking" asp-action="Book" asp-route-listingId="@Model.Id"
+                           class="btn btn-primary btn-lg w-100 py-3 rounded-3 fw-bold" style="font-size: 1.1rem;">
+                        <i class="bi bi-calendar-check me-2"></i>Book Now
+                    </a>
+                
+                    @if (Model.OwnerId != int.Parse(User.Claims.FirstOrDefault(c => c.Type ==
+                                System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"))
+                    {
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-lg w-100 py-3 mt-3 rounded-3 fw-bold open-chat-btn"
+                                data-owner-id="@Model.OwnerId" data-owner-name="@Model.Owner?.Name" style="font-size: 1.1rem;">
+                            <i class="bi bi-chat-dots me-2"></i>Contact Seller
+                        </button>
+                    }
+                }
+                else if (!isLoggedIn)
+                {
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg w-100 py-3 rounded-3 fw-bold">
+                        Log in to Book
+                    </a>
+                }
+                else if (Model.Status != "Approved")
+                {
+                    <button class="btn btn-secondary btn-lg w-100 py-3 rounded-3 fw-bold" disabled>
+                        Listing is @Model.Status
                     </button>
                 }
-            }
-            else if (!isLoggedIn)
-            {
-                <a asp-controller="Auth" asp-action="Login"
-                   class="btn btn-primary btn-lg w-100 py-3 rounded-3 fw-bold">
-                    Log in to Book
-                </a>
-            }
-            else if (Model.Status != "Approved")
-            {
-                <button class="btn btn-secondary btn-lg w-100 py-3 rounded-3 fw-bold" disabled>
-                    Listing is @Model.Status
-                </button>
-            }
+
+                <div class="mt-5">
+                    <h5 class="fw-bold mb-3">Reviews</h5>
+                    @if (reviewCount == 0)
+                    {
+                        <div class="glass-panel p-3" style="color: var(--sb-text-muted);">
+                            No reviews yet for this listing.
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var review in Model.Reviews!.OrderByDescending(r => r.Id))
+                        {
+                            <div class="glass-panel p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>@review.User?.Name</strong>
+                                    <span style="color: var(--sb-warning);">
+                                        @for (int i = 0; i < review.Rating; i++)
+                                        {
+                                            <i class="bi bi-star-fill"></i>
+                                        }
+                                        @for (int i = review.Rating; i < 5; i++)
+                                        {
+                                            <i class="bi bi-star"></i>
+                                        }
+                                    </span>
+                                </div>
+                                <p class="mb-0" style="color: var(--sb-text-muted);">@review.Comment</p>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
         </div>
     </div>
-</div>

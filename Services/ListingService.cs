@@ -16,7 +16,7 @@ namespace SmartBorrowLK.Services
     }
 
     // Helper class to parse Gemini's JSON response
-    public class AIGeneratedData 
+    public class AIGeneratedData
     {
         public string Description { get; set; } = string.Empty;
         public decimal PricePerDay { get; set; }
@@ -55,8 +55,8 @@ namespace SmartBorrowLK.Services
             {
                 imageUrl = await _cloudinary.UploadImageAsync(imageBytes, model.Image!.FileName);
             }
-            
-            if (string.IsNullOrEmpty(imageUrl)) 
+
+            if (string.IsNullOrEmpty(imageUrl))
             {
                 _logger.LogError("Cloudinary upload failed for user {UserId}", userId);
                 return null;
@@ -75,7 +75,7 @@ namespace SmartBorrowLK.Services
             _logger.LogInformation("Calling Gemini AI for listing generation...");
             var aiResponse = await _aiService.GenerateListingDetailsAsync(model.RawDescription, base64Image);
             _logger.LogInformation("Gemini AI response length: {Length}", aiResponse?.Length ?? 0);
-            
+
             if (!string.IsNullOrEmpty(aiResponse))
             {
                 try
@@ -83,17 +83,17 @@ namespace SmartBorrowLK.Services
                     // Extract JSON block between the first { and last }
                     int startIdx = aiResponse.IndexOf('{');
                     int endIdx = aiResponse.LastIndexOf('}');
-                    
+
                     if (startIdx >= 0 && endIdx > startIdx)
                     {
                         var cleanJson = aiResponse.Substring(startIdx, endIdx - startIdx + 1);
                         _logger.LogInformation("Extracted JSON: {Json}", cleanJson);
 
                         var aiData = JsonSerializer.Deserialize<AIGeneratedData>(cleanJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                        
+
                         if (aiData != null)
                         {
-                            _logger.LogInformation("AI generated: Desc={Desc}, Price={Price}, Terms={Terms}", 
+                            _logger.LogInformation("AI generated: Desc={Desc}, Price={Price}, Terms={Terms}",
                                 aiData.Description?.Length > 50 ? aiData.Description[..50] + "..." : aiData.Description,
                                 aiData.PricePerDay,
                                 aiData.Terms?.Length > 50 ? aiData.Terms[..50] + "..." : aiData.Terms);
@@ -171,13 +171,13 @@ namespace SmartBorrowLK.Services
                 Description = aiDescription,
                 Terms = terms,
                 RiskScore = riskScore,
-                Status = riskScore > 80 ? "Rejected" : "Pending" 
+                Status = riskScore > 80 ? "Rejected" : "Pending"
             };
 
             _context.Listings.Add(listing);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Listing created successfully: ID={Id}, Price={Price}, Risk={Risk}, Status={Status}", 
+            _logger.LogInformation("Listing created successfully: ID={Id}, Price={Price}, Risk={Risk}, Status={Status}",
                 listing.Id, listing.PricePerDay, listing.RiskScore, listing.Status);
 
             return listing;
@@ -207,6 +207,8 @@ namespace SmartBorrowLK.Services
             return await _context.Listings
                 .Include(l => l.Item)
                 .Include(l => l.Owner)
+                .Include(l => l.Reviews)
+                    .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(l => l.Id == id);
         }
     }

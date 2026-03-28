@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace SmartBorrowLK.Models
 {
@@ -21,5 +22,6 @@ namespace SmartBorrowLK.Models
         public string Condition { get; set; } = string.Empty;
         public string? ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }
