@@ -69,6 +69,9 @@
                     </ul>
                 
                     <div class="d-flex align-items-center ms-auto">
+                        <button id="themeToggle" class="theme-toggle me-3" aria-label="Toggle Theme">
+                            <i class="bi bi-moon-fill"></i>
+                        </button>
                         @if (isLoggedIn)
                         {
                             <a href="#" class="notification-icon" aria-label="Notifications">
@@ -177,7 +180,13 @@
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/js/theme.js" asp-append-version="true"></script>
         @await RenderSectionAsync("Scripts", required: false)
     </body>
 
 </html>
+
+
+
+
+
