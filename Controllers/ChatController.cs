@@ -134,5 +134,40 @@ namespace SmartBorrowLK.Controllers
             var unreadCount = await _context.Messages.CountAsync(m => m.ReceiverId == userId.Value && !m.IsRead);
             return Ok(new { count = unreadCount });
         }
+
+        [HttpGet("conversations")]
+        public async Task<IActionResult> GetConversations()
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var messages = await _context.Messages
+                .Include(m => m.Sender)
+                .Include(m => m.Receiver)
+                .Where(m => m.SenderId == userId || m.ReceiverId == userId)
+                .OrderByDescending(m => m.CreatedAt)
+                .ToListAsync();
+
+            var conversations = messages
+                .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
+                .Select(g => 
+                {
+                    var lastMessage = g.First();
+                    var partnerId = g.Key;
+                    var partner = lastMessage.SenderId == userId ? lastMessage.Receiver : lastMessage.Sender;
+                    var unread = g.Count(m => m.ReceiverId == userId && !m.IsRead);
+                    return new {
+                        partnerId = partnerId,
+                        partnerName = partner?.Name ?? "Unknown",
+                        partnerAvatar = partner?.ProfileImageUrl,
+                        lastMessage = lastMessage.Content,
+                        lastMessageTime = lastMessage.CreatedAt,
+                        unreadCount = unread
+                    };
+                })
+                .ToList();
+
+            return Ok(conversations);
+        }
     }
 }

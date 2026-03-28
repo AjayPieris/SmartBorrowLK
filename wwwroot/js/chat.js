@@ -13,63 +13,148 @@ $(document).ready(function () {
 
     channel.bind('new-message', function (data) {
         if (isChatOpen && currentChatPartnerId == data.senderId) {
-            // Chat is open with this user, append message
+            // Active chat is open with sender
             appendMessage(data, false);
             scrollToBottom();
-            // Optional: Send a read receipt here if implemented
+            
+            // Refresh to mark as read and update global count
+            refreshConversations();
         } else {
-            // Show badge
+            // Update global badge
+            let countSpan = $('#chatUnreadCount');
+            let current = parseInt(countSpan.text()) || 0;
+            countSpan.text(current + 1);
             $('#globalChatBadge').removeClass('d-none');
-            // Play sound or show toast notification if desired
+
+            // Play sound or show toast notification like WhatsApp
+            let preview = (data.content && data.content.length > 30) ? data.content.substring(0, 30) + '...' : (data.content || 'New Message!');
+            $('#toastMessageContent').text("New message: " + preview);
+            let toastEl = new bootstrap.Toast(document.getElementById('chatToneToast'));
+            toastEl.show();
+            
+            // Refresh conversation list to show new badge locally
+            refreshConversations();
         }
     });
 
-    // Check for unread on load
-    $.get('/api/chat/unread', function (res) {
-        if (res.count > 0) {
-            $('#globalChatBadge').removeClass('d-none');
-        }
-    });
+    // Initial Load
+    refreshConversations();
 
-    // Open chat from Contact Seller button
+    function refreshConversations() {
+        $.get('/api/chat/conversations', function (res) {
+            const list = $('#chatConversationsList');
+            list.empty();
+            let totalUnread = 0;
+            
+            if (!res || res.length === 0) {
+                list.append('<li class="p-3 text-center text-muted" style="font-size: 0.9rem;">No conversations yet</li>');
+            } else {
+                res.forEach(c => {
+                    totalUnread += c.unreadCount;
+                    const isActive = (c.partnerId == currentChatPartnerId) ? 'active' : '';
+                    let avatarHtml = c.partnerAvatar ? 
+                        `<img src="${c.partnerAvatar}" alt="${escapeHtml(c.partnerName)}">` :
+                        escapeHtml(c.partnerName.charAt(0).toUpperCase());
+
+                    const timeStr = new Date(c.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
+                    const el = `
+                    <li class="chat-conversation-item ${isActive}" data-id="${c.partnerId}" data-name="${escapeHtml(c.partnerName)}" data-avatar="${c.partnerAvatar || ''}">
+                        <div class="conversation-avatar">${avatarHtml}</div>
+                        <div class="conversation-details">
+                            <div class="conversation-name-row">
+                                <span class="conversation-name">${escapeHtml(c.partnerName)}</span>
+                                <span class="conversation-time">${timeStr}</span>
+                            </div>
+                            <div class="conversation-msg-row">
+                                <p class="conversation-last-msg">${escapeHtml(c.lastMessage)}</p>
+                                ${c.unreadCount > 0 ? `<span class="conversation-unread-badge">${c.unreadCount}</span>` : ''}
+                            </div>
+                        </div>
+                    </li>
+                    `;
+                    list.append(el);
+                });
+            }
+
+            if (totalUnread > 0) {
+                $('#chatUnreadCount').text(totalUnread);
+                $('#globalChatBadge').removeClass('d-none');
+            } else {
+                $('#globalChatBadge').addClass('d-none');
+            }
+            
+            // Bind click
+            $('.chat-conversation-item').off('click').on('click', function() {
+                $('.chat-conversation-item').removeClass('active');
+                $(this).addClass('active');
+                openActiveChat($(this).data('id'), $(this).data('name'), $(this).data('avatar'));
+            });
+            
+        }).fail(function() {
+             $('#chatConversationsList').html('<li class="p-3 text-center text-danger" style="font-size: 0.9rem;">Failed to load chats</li>');
+        });
+    }
+
+    // Open chat from Contact Seller button on Listing Page
     $('.open-chat-btn').on('click', function () {
         const ownerId = $(this).data('owner-id');
         if (!ownerId) return;
-        openChatWindow(ownerId);
+        
+        $('#globalChatWidget').addClass('active');
+        isChatOpen = true;
+        
+        // Optimistically open chat
+        openActiveChat(ownerId, "Vendor", null);
+        
+        refreshConversations();
     });
 
-    // Navbar toggle behavior (Opens last person or blank)
+    // Navbar toggle behavior
     $('#navbarChatBtn').on('click', function () {
         if (isChatOpen) {
-            closeChatWindow();
+            closeWidget();
         } else {
-            // If they click the navbar icon, just open the window.
-            // If they haven't selected anyone, it shows the blank state.
             $('#globalChatWidget').addClass('active');
             isChatOpen = true;
-            $('#globalChatBadge').addClass('d-none'); // Optimistically clear
+            refreshConversations();
         }
     });
 
-    $('#closeChatBtn').on('click', function () {
-        closeChatWindow();
+    $('#closeSidebarBtn').on('click', function() {
+        closeWidget();
+    });
+    
+    $('#closeEmptyStateBtn').on('click', function() {
+        closeWidget(); 
     });
 
-    function closeChatWindow() {
+    $('#closeChatBtn').on('click', function () {
+        closeActiveChat();
+    });
+
+    function closeWidget() {
         $('#globalChatWidget').removeClass('active');
         isChatOpen = false;
     }
 
-    function openChatWindow(partnerId) {
-        if (currentChatPartnerId !== partnerId) {
-            currentChatPartnerId = partnerId;
-            loadChatHistory(partnerId);
-        }
-        $('#globalChatWidget').addClass('active');
-        isChatOpen = true;
+    function closeActiveChat() {
+        currentChatPartnerId = null;
+        $('#chatActiveState').addClass('d-none');
+        $('#chatEmptyState').removeClass('d-none');
+        $('.chat-conversation-item').removeClass('active');
     }
 
-    function loadChatHistory(partnerId) {
+    function openActiveChat(partnerId, partnerName, partnerAvatar) {
+        currentChatPartnerId = partnerId;
+        
+        $('#chatEmptyState').addClass('d-none');
+        $('#chatActiveState').removeClass('d-none');
+        
+        loadChatHistory(partnerId, partnerName, partnerAvatar);
+    }
+
+    function loadChatHistory(partnerId, fallbackName, fallbackAvatar) {
         $('#chatBody').html('<div class="text-center mt-4"><div class="spinner-border text-primary spinner-border-sm" role="status"></div></div>');
         $('#chatInputMessage').prop('disabled', true);
         $('#chatSendBtn').prop('disabled', true);
@@ -79,11 +164,11 @@ $(document).ready(function () {
             const messages = res.messages;
 
             // Updated header
-            $('#chatPartnerName').text(receiver.name);
-            if (receiver.profileImageUrl) {
-                $('#chatPartnerAvatar').html(`<img src="${receiver.profileImageUrl}" alt="${receiver.name}"/>`);
+            $('#chatPartnerName').text(receiver.name || fallbackName);
+            if (receiver.profileImageUrl || fallbackAvatar) {
+                $('#chatPartnerAvatar').html(`<img src="${receiver.profileImageUrl || fallbackAvatar}" alt="${escapeHtml(receiver.name || fallbackName)}"/>`);
             } else {
-                $('#chatPartnerAvatar').html((receiver.name ? receiver.name.charAt(0).toUpperCase() : '?'));
+                $('#chatPartnerAvatar').html(escapeHtml((receiver.name || fallbackName || '?').charAt(0).toUpperCase()));
             }
 
             // Render Messages
@@ -102,6 +187,9 @@ $(document).ready(function () {
 
             $('#chatInputMessage').prop('disabled', false).focus();
             $('#chatSendBtn').prop('disabled', false);
+
+            // Refetch conversations just to update badges globally since we read messages
+            refreshConversations();
 
         }).fail(function () {
             $('#chatBody').html('<div class="text-center text-danger mt-4">Failed to load messages</div>');
@@ -160,8 +248,8 @@ $(document).ready(function () {
                 content: info
             }),
             success: function () {
-                // Sent successfully - handled optimistically.
-                // Could update status ticks here if implemented.
+                // Sent successfully - refresh to push conversation to top
+                refreshConversations();
             },
             error: function () {
                 alert("Failed to send message.");

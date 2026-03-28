@@ -93,8 +93,9 @@
 
                         <a href="javascript:void(0)" class="chat-icon ms-2 me-3 position-relative" id="navbarChatBtn" aria-label="Chat">
                             <i class="bi bi-chat-dots fs-5"></i>
-                            <span id="globalChatBadge" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none">
-                                <span class="visually-hidden">New alerts</span>
+                            <span id="globalChatBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                <span id="chatUnreadCount">0</span>
+                                <span class="visually-hidden">unread messages</span>
                             </span>
                         </a>
 
@@ -196,28 +197,78 @@
         </div>
     </footer>
 
+    <!-- Global Notification Toast -->
+    <div class="toast-container position-fixed bottom-0 start-0 p-3" style="z-index: 1055;">
+        <div id="chatToneToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+            <div class="d-flex">
+                <div class="toast-body" style="font-weight: 500; font-size: 0.95rem;">
+                    <i class="bi bi-whatsapp me-2"></i> <span id="toastMessageContent">New message received</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Global Chat Widget -->
     @if (isLoggedIn)
     {
         <div class="chat-widget" id="globalChatWidget">
-            <div class="chat-header">
-                <div class="chat-header-info">
-                    <div class="chat-partner-avatar" id="chatPartnerAvatar">?</div>
-                    <div>
-                        <h4 class="chat-partner-name" id="chatPartnerName">Select a user</h4>
-                        <p class="chat-partner-status">Online</p>
+            <!-- Left Pane: Conversations -->
+            <div class="chat-sidebar">
+                <div class="chat-sidebar-header">
+                    Chats
+                    <button class="chat-close-btn d-md-none" id="closeSidebarBtn">&times;</button>
+                </div>
+                <ul class="chat-sidebar-list" id="chatConversationsList">
+                    <li class="p-4 text-center text-muted" style="font-size: 0.9rem;">
+                        <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                        <div>Loading chats...</div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right Pane: Active Chat -->
+            <div class="chat-main" id="chatMainPane">
+                
+                <!-- Empty State -->
+                <div class="chat-body-empty position-relative" id="chatEmptyState">
+                    <button class="chat-close-btn position-absolute top-0 end-0 m-3" id="closeEmptyStateBtn">&times;</button>
+                    <i class="bi bi-whatsapp" style="font-size: 4rem; color: #d0d0d0;"></i>
+                    <h5 class="mt-3 text-muted">SmartBorrow Web</h5>
+                    <p class="text-muted" style="font-size: 0.9rem;">Select a user on the left to start chatting.</p>
+                </div>
+
+                <!-- Active State (Hidden by default) -->
+                <div class="d-flex flex-column h-100 d-none" id="chatActiveState">
+                    <div class="chat-header">
+                        <div class="chat-header-info">
+                            <div class="chat-partner-avatar" id="chatPartnerAvatar">?</div>
+                            <div>
+                                <h1 class="chat-partner-name" id="chatPartnerName" style="font-size: 1rem; margin-bottom: 2px;">User</h1>
+                                <p class="chat-partner-status" style="font-size: 0.75rem; margin-bottom: 0;">Online</p>
+                            </div>
+                        </div>
+                        <div class="chat-header-actions">
+                            <i class="bi bi-search"></i>
+                            <i class="bi bi-three-dots-vertical"></i>
+                            <button class="chat-close-btn p-0 ms-2" id="closeChatBtn" style="font-size: 1.4rem;">&times;</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-body" id="chatBody"></div>
+                    
+                    <div class="chat-footer">
+                        <div class="footer-actions">
+                            <i class="bi bi-emoji-smile"></i>
+                            <i class="bi bi-paperclip"></i>
+                        </div>
+                        <input type="text" class="chat-input" id="chatInputMessage" placeholder="Type a message..." maxlength="500" />
+                        <button class="chat-send-btn" id="chatSendBtn">
+                            <i class="bi bi-send-fill" style="margin-left: 3px;"></i>
+                        </button>
                     </div>
                 </div>
-                <button class="chat-close-btn" id="closeChatBtn">&times;</button>
-            </div>
-            <div class="chat-body" id="chatBody">
-                <div class="text-center text-muted mt-5 mb-5" style="font-size: 0.9rem;">Start a conversation</div>
-            </div>
-            <div class="chat-footer">
-                <input type="text" class="chat-input" id="chatInputMessage" placeholder="Type a message..." maxlength="500" disabled />
-                <button class="chat-send-btn" id="chatSendBtn" disabled>
-                    <i class="bi bi-send-fill"></i>
-                </button>
+
             </div>
         </div>
 
