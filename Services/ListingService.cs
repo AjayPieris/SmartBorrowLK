@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using SmartBorrowLK.Data;
 using SmartBorrowLK.Models;
@@ -27,71 +28,130 @@ namespace SmartBorrowLK.Services
         private readonly AppDbContext _context;
         private readonly ICloudinaryService _cloudinary;
         private readonly IAIService _aiService;
+        private readonly ILogger<ListingService> _logger;
 
-        public ListingService(AppDbContext context, ICloudinaryService cloudinary, IAIService aiService)
+        public ListingService(AppDbContext context, ICloudinaryService cloudinary, IAIService aiService, ILogger<ListingService> logger)
         {
             _context = context;
             _cloudinary = cloudinary;
             _aiService = aiService;
+            _logger = logger;
         }
 
         public async Task<Listing?> CreateListingAsync(int userId, CreateListingViewModel model)
         {
-            // 1. Upload Image to Cloudinary
-            var imageUrl = await _cloudinary.UploadImageAsync(model.Image);
-            if (string.IsNullOrEmpty(imageUrl)) return null;
+            // 1. Read the image file into a byte array FIRST (before any service consumes the stream)
+            byte[]? imageBytes = null;
+            if (model.Image != null && model.Image.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await model.Image.CopyToAsync(ms);
+                imageBytes = ms.ToArray();
+            }
 
-            // 2. Try to call Gemini AI to generate details
-            string aiDescription = model.RawDescription;
+            // 2. Upload Image to Cloudinary using the byte array (safe - no double stream read)
+            string imageUrl = string.Empty;
+            if (imageBytes != null)
+            {
+                imageUrl = await _cloudinary.UploadImageAsync(imageBytes, model.Image!.FileName);
+            }
+            
+            if (string.IsNullOrEmpty(imageUrl)) 
+            {
+                _logger.LogError("Cloudinary upload failed for user {UserId}", userId);
+                return null;
+            }
+
+            _logger.LogInformation("Image uploaded to Cloudinary: {Url}", imageUrl);
+
+            // 3. Convert image bytes to base64 for Gemini AI analysis
+            string? base64Image = imageBytes != null ? Convert.ToBase64String(imageBytes) : null;
+
+            // 4. Call Gemini AI to generate listing details
+            string aiDescription = model.RawDescription ?? "";
             decimal pricePerDay = model.ManualPrice ?? 0;
             string terms = "Standard rental terms apply. Item must be returned in the same condition.";
-            
-            var aiResponse = await _aiService.GenerateListingDetailsAsync(model.RawDescription);
+
+            _logger.LogInformation("Calling Gemini AI for listing generation...");
+            var aiResponse = await _aiService.GenerateListingDetailsAsync(model.RawDescription, base64Image);
+            _logger.LogInformation("Gemini AI response length: {Length}", aiResponse?.Length ?? 0);
             
             if (!string.IsNullOrEmpty(aiResponse))
             {
                 try
                 {
-                    // Clean markdown formatting if Gemini includes it (e.g., ```json ... ```)
-                    var cleanJson = aiResponse.Replace("```json", "").Replace("```", "").Trim();
-                    var aiData = JsonSerializer.Deserialize<AIGeneratedData>(cleanJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                    if (aiData != null)
+                    // Extract JSON block between the first { and last }
+                    int startIdx = aiResponse.IndexOf('{');
+                    int endIdx = aiResponse.LastIndexOf('}');
+                    
+                    if (startIdx >= 0 && endIdx > startIdx)
                     {
-                        aiDescription = aiData.Description;
-                        terms = aiData.Terms;
-                        // Use manual price if provided, otherwise use AI price
-                        if (!model.ManualPrice.HasValue || model.ManualPrice.Value <= 0)
+                        var cleanJson = aiResponse.Substring(startIdx, endIdx - startIdx + 1);
+                        _logger.LogInformation("Extracted JSON: {Json}", cleanJson);
+
+                        var aiData = JsonSerializer.Deserialize<AIGeneratedData>(cleanJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        
+                        if (aiData != null)
                         {
-                            pricePerDay = aiData.PricePerDay;
+                            _logger.LogInformation("AI generated: Desc={Desc}, Price={Price}, Terms={Terms}", 
+                                aiData.Description?.Length > 50 ? aiData.Description[..50] + "..." : aiData.Description,
+                                aiData.PricePerDay,
+                                aiData.Terms?.Length > 50 ? aiData.Terms[..50] + "..." : aiData.Terms);
+
+                            aiDescription = aiData.Description;
+                            terms = aiData.Terms;
+                            // Use manual price if provided, otherwise use AI price
+                            if (!model.ManualPrice.HasValue || model.ManualPrice.Value <= 0)
+                            {
+                                pricePerDay = aiData.PricePerDay;
+                            }
                         }
+                        else
+                        {
+                            _logger.LogWarning("AI response deserialized to null");
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No JSON object found in AI response: {Response}", aiResponse);
                     }
                 }
                 catch (JsonException ex)
                 {
-                    Console.WriteLine($"Failed to parse AI response: {ex.Message}");
-                    // Continue with manual/default values
+                    _logger.LogError(ex, "Failed to parse AI response JSON: {Response}", aiResponse);
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Unexpected error processing AI response");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Gemini AI returned empty response. Using manual/default values.");
             }
 
             // Ensure we have a valid price
             if (pricePerDay <= 0)
             {
                 pricePerDay = model.ManualPrice ?? 500; // Default fallback
+                _logger.LogWarning("Price was 0 or negative. Using fallback: {Price}", pricePerDay);
             }
 
-            // 3. Try to get AI risk score (with fallback)
-            int riskScore = 0;
+            // 5. Get AI risk score (with fallback)
+            int riskScore = 25; // default
             try
             {
+                _logger.LogInformation("Calculating AI risk score...");
                 riskScore = await _aiService.CalculateRiskScoreAsync(aiDescription, pricePerDay);
+                _logger.LogInformation("AI Risk Score: {Score}", riskScore);
             }
-            catch
+            catch (Exception ex)
             {
-                riskScore = 25; // Default low-risk score if AI fails
+                _logger.LogError(ex, "Risk score calculation failed. Using default: 25");
+                riskScore = 25;
             }
 
-            // 4. Save to Database (PostgreSQL via Neon)
+            // 6. Save to Database (PostgreSQL via Neon)
             var item = new Item
             {
                 Name = model.ItemName,
@@ -101,7 +161,7 @@ namespace SmartBorrowLK.Services
             };
 
             _context.Items.Add(item);
-            await _context.SaveChangesAsync(); // Save to get the ItemId
+            await _context.SaveChangesAsync();
 
             var listing = new Listing
             {
@@ -111,12 +171,14 @@ namespace SmartBorrowLK.Services
                 Description = aiDescription,
                 Terms = terms,
                 RiskScore = riskScore,
-                // If risk is too high, auto-reject. Otherwise, pending admin approval.
                 Status = riskScore > 80 ? "Rejected" : "Pending" 
             };
 
             _context.Listings.Add(listing);
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Listing created successfully: ID={Id}, Price={Price}, Risk={Risk}, Status={Status}", 
+                listing.Id, listing.PricePerDay, listing.RiskScore, listing.Status);
 
             return listing;
         }

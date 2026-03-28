@@ -4,81 +4,79 @@
 }
 
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-end mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end mb-5 gap-3 fade-in-up">
         <div>
-            <h2 class="fw-bold mb-1" style="color: var(--sb-secondary);">My Bookings</h2>
-            <p class="text-muted mb-0">Track your current and past rentals</p>
+            <h2 class="fw-bold mb-1" style="font-size: 2rem;">My Bookings</h2>
+            <p style="color: var(--sb-text-muted); margin-bottom: 0;">Track your current and past rentals</p>
         </div>
-        <div>
-            <a asp-controller="Listing" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4">
-                <i class="bi bi-search me-1"></i> Find Gear
-            </a>
-        </div>
+        <a asp-controller="Listing" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4">
+            <i class="bi bi-search me-1"></i> Find Gear
+        </a>
     </div>
 
     @if (!Model.Any())
     {
-        <div class="empty-state">
-            <i class="bi bi-calendar-x display-1 text-muted opacity-50 mb-3"></i>
-            <h4 class="fw-semibold" style="color: var(--sb-secondary);">No bookings yet</h4>
-            <p class="text-muted mb-4">You haven't rented any items. Head to the marketplace to find gear!</p>
-            <a asp-controller="Listing" asp-action="Index" class="btn btn-primary rounded-pill px-4">Explore Marketplace</a>
+        <div class="empty-state fade-in-up">
+            <i class="bi bi-calendar-x"></i>
+            <h4 class="fw-bold mt-3 mb-2">No bookings yet</h4>
+            <p style="color: var(--sb-text-muted);">You haven't rented any items. Head to the marketplace to find gear!</p>
+            <a asp-controller="Listing" asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-2">Explore Marketplace</a>
         </div>
     }
     else
     {
-        <div class="sb-card border-0 shadow-sm overflow-hidden">
+        <div class="glass-panel overflow-hidden fade-in-up delay-1">
             <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead class="bg-light">
+                <table class="table mb-0">
+                    <thead>
                         <tr>
-                            <th class="ps-4 py-3">Item Reserved</th>
-                            <th class="py-3">Rental Dates</th>
-                            <th class="py-3">Duration</th>
-                            <th class="py-3">Total Cost</th>
-                            <th class="py-3">Status</th>
-                            <th class="text-end pe-4 py-3">Actions</th>
+                            <th class="ps-4">Item Reserved</th>
+                            <th>Rental Dates</th>
+                            <th>Duration</th>
+                            <th>Total Cost</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var booking in Model)
                         {
-                            var days = (booking.EndDate - booking.StartDate).Days + 1; // +1 to include both start and end dates
+                            var days = (booking.EndDate - booking.StartDate).Days + 1;
                             var totalCost = days * booking.Listing.PricePerDay;
                             var isPast = booking.EndDate < DateTime.UtcNow.Date;
 
                             <tr>
-                                <td class="ps-4 py-3">
+                                <td class="ps-4">
                                     <div class="d-flex align-items-center">
                                         @if (!string.IsNullOrEmpty(booking.Listing.Item?.ImageUrl))
                                         {
                                             <img src="@booking.Listing.Item.ImageUrl" alt="@booking.Listing.Item.Name"
-                                                 class="rounded-3 me-3" style="width: 50px; height: 50px; object-fit: cover;" />
+                                                 class="me-3" style="width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--sb-outline);" />
                                         }
                                         else
                                         {
-                                            <div class="bg-light rounded-3 me-3 d-flex align-items-center justify-content-center text-muted"
-                                                 style="width: 50px; height: 50px;">
+                                            <div class="me-3 d-flex align-items-center justify-content-center"
+                                                 style="width: 48px; height: 48px; border-radius: 10px; background: var(--sb-surface); color: var(--sb-text-dim);">
                                                 <i class="bi bi-camera"></i>
                                             </div>
                                         }
-                                        <div class="fw-semibold text-dark">@booking.Listing?.Item?.Name</div>
+                                        <span class="fw-semibold">@booking.Listing?.Item?.Name</span>
                                     </div>
                                 </td>
-                                <td class="py-3 text-muted small">
-                                    <div class="fw-medium text-dark">@booking.StartDate.ToString("MMM dd, yyyy")</div>
-                                    <div>to @booking.EndDate.ToString("MMM dd, yyyy")</div>
+                                <td>
+                                    <div class="fw-medium">@booking.StartDate.ToString("MMM dd, yyyy")</div>
+                                    <div class="small" style="color: var(--sb-text-muted);">to @booking.EndDate.ToString("MMM dd, yyyy")</div>
                                 </td>
-                                <td class="py-3 text-muted">@days Days</td>
-                                <td class="py-3 fw-semibold text-accent">Rs. @totalCost.ToString("N0")</td>
-                                <td class="py-3">
+                                <td style="color: var(--sb-text-muted);">@days Days</td>
+                                <td class="fw-bold text-price">Rs. @totalCost.ToString("N0")</td>
+                                <td>
                                     @if (booking.Status == "Pending")
                                     {
-                                        <span class="badge bg-warning-subtle text-warning">Pending Approval</span>
+                                        <span class="status-pill pending">Pending</span>
                                     }
                                     else if (booking.Status == "Rejected")
                                     {
-                                        <span class="badge bg-danger-subtle text-danger">Rejected</span>
+                                        <span class="status-pill rejected">Rejected</span>
                                     }
                                     else if (isPast)
                                     {
@@ -86,22 +84,22 @@
                                     }
                                     else if (booking.StartDate > DateTime.UtcNow.Date)
                                     {
-                                        <span class="badge bg-primary-subtle text-primary">Upcoming</span>
+                                        <span class="status-pill approved">Upcoming</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-success-subtle text-success">Active Now</span>
+                                        <span class="badge bg-success-subtle">Active Now</span>
                                     }
                                 </td>
-                                <td class="text-end pe-4 py-3">
+                                <td class="text-end pe-4">
                                     <a asp-controller="Listing" asp-action="Details" asp-route-id="@booking.ListingId"
-                                           class="btn btn-sm btn-light rounded-pill px-3 me-2">
+                                       class="btn btn-light btn-sm rounded-pill px-3 me-1">
                                         View
                                     </a>
                                     @if (isPast && booking.Status == "Approved")
                                     {
                                         <a asp-controller="Review" asp-action="Create" asp-route-listingId="@booking.ListingId"
-                                               class="btn btn-sm btn-outline-warning rounded-pill px-3">
+                                           class="btn btn-outline-warning btn-sm rounded-pill px-3">
                                             <i class="bi bi-star-fill me-1"></i> Review
                                         </a>
                                     }

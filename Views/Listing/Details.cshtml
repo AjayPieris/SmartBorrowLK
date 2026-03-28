@@ -5,27 +5,26 @@
 }
 
 <div class="container py-5">
-    <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-pill mb-4 px-3">
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3 mb-4">
         <i class="bi bi-arrow-left me-1"></i> Back to Browse
     </a>
 
-    <div class="row g-5">
+    <div class="row g-5 fade-in-up">
         <!-- Image Column -->
         <div class="col-lg-6">
             <div class="position-sticky" style="top: 100px;">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="@Model.ImageUrl" alt="@Model.Item?.Name" class="detail-image shadow-sm" />
+                    <img src="@Model.ImageUrl" alt="@Model.Item?.Name" class="detail-image" />
                 }
                 else if (!string.IsNullOrEmpty(Model.Item?.ImageUrl))
                 {
-                    <img src="@Model.Item.ImageUrl" alt="@Model.Item.Name" class="detail-image shadow-sm" />
+                    <img src="@Model.Item.ImageUrl" alt="@Model.Item.Name" class="detail-image" />
                 }
                 else
                 {
-                    <div class="detail-image d-flex align-items-center justify-content-center border"
-                         style="height: 400px;">
-                        <i class="bi bi-camera display-1 text-muted opacity-25"></i>
+                    <div class="detail-image d-flex align-items-center justify-content-center" style="height: 400px; background: var(--sb-surface);">
+                        <i class="bi bi-camera" style="font-size: 3rem; color: var(--sb-text-dim); opacity: 0.3;"></i>
                     </div>
                 }
             </div>
@@ -34,67 +33,78 @@
         <!-- Details Column -->
         <div class="col-lg-6">
             <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-primary-subtle rounded-pill">@Model.Item?.Condition</span>
-                <div class="rating-badge rounded-pill">
+                <span class="badge" style="background: rgba(129,236,255,0.1); color: var(--sb-primary);">@Model.Item?.Condition</span>
+                <div class="rating-badge">
                     <i class="bi bi-star-fill"></i> 4.9 (12 reviews)
                 </div>
             </div>
 
-            <h1 class="fw-bold mb-3" style="color: var(--sb-secondary); font-size: 2.5rem; letter-spacing: -0.5px;">
-                @Model.Item?.Name</h1>
-            
-                <div class="d-flex align-items-end gap-2 mb-4 pb-4 border-bottom border-light">
-                    <span class="fw-bold text-accent" style="font-size: 2rem;">Rs. @Model.PricePerDay.ToString("N0")</span>
-                    <span class="text-muted pb-2">/ day</span>
-                </div>
+            <h1 class="fw-bold mb-3" style="font-size: 2.2rem; letter-spacing: -0.02em;">@Model.Item?.Name</h1>
 
-                <div class="mb-4">
-                    <h5 class="fw-semibold mb-3">Description</h5>
-                    <p class="text-muted" style="line-height: 1.7;">@Model.Description</p>
-                </div>
+            <div class="d-flex align-items-end gap-2 mb-4 pb-4" style="border-bottom: 1px solid var(--sb-outline);">
+                <span class="text-price" style="font-size: 2rem;">Rs. @Model.PricePerDay.ToString("N0")</span>
+                <span class="pb-1" style="color: var(--sb-text-muted);">/ day</span>
+            </div>
 
-                <div class="mb-4">
-                    <h5 class="fw-semibold mb-3">Rental Terms</h5>
-                    <div class="bg-light p-4 rounded-3 text-muted small" style="line-height: 1.6;">
-                        @Model.Terms
-                    </div>
-                </div>
+            <div class="mb-4">
+                <h5 class="fw-bold mb-3">Description</h5>
+                <p style="color: var(--sb-text-muted); line-height: 1.7;">@Model.Description</p>
+            </div>
 
-                <div class="d-flex align-items-center mb-5 mt-4 p-3 border rounded-3 bg-white shadow-sm">
-                    <div class="profile-avatar bg-primary text-white me-3"
-                         style="width: 50px; height: 50px; font-size: 1.2rem;">
-                        @(string.IsNullOrEmpty(Model.Owner?.Name) ? "O" : Model.Owner.Name.Substring(0, 1).ToUpper())
-                    </div>
-                    <div>
-                        <h6 class="mb-0 fw-bold">Owned by @Model.Owner?.Name</h6>
-                        <small class="text-muted">Verified Vendor <i
-                            class="bi bi-patch-check-fill text-primary ms-1"></i></small>
-                        </div>
-                        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 ms-auto">Message</button>
-                    </div>
-
-                    @if (isLoggedIn && Model.Status == "Approved")
-                    {
-                        <div class="d-flex gap-3">
-                            <a asp-controller="Booking" asp-action="Book" asp-route-listingId="@Model.Id"
-                                   class="btn btn-primary btn-lg rounded-pill flex-grow-1 shadow-sm fs-5 py-3">
-                                Book Now
-                            </a>
-                        </div>
-                    }
-                    else if (!isLoggedIn)
-                    {
-                        <a asp-controller="Auth" asp-action="Login"
-                               class="btn btn-primary btn-lg rounded-pill w-100 shadow-sm py-3">
-                            Log in to Book
-                        </a>
-                    }
-                    else if (Model.Status != "Approved")
-                    {
-                        <button class="btn btn-secondary btn-lg rounded-pill w-100 py-3" disabled>
-                            Listing is @Model.Status
-                        </button>
-                    }
+            <div class="mb-4">
+                <h5 class="fw-bold mb-3">Rental Terms</h5>
+                <div class="glass-panel p-3" style="color: var(--sb-text-muted); font-size: 0.9rem; line-height: 1.7;">
+                    @Model.Terms
                 </div>
             </div>
+
+            <div class="d-flex align-items-center mb-4 p-3 glass-panel">
+                <div class="profile-avatar me-3" style="width: 48px; height: 48px; font-size: 1.1rem; overflow: hidden;">
+                    @if (!string.IsNullOrEmpty(Model.Owner?.ProfileImageUrl))
+                    {
+                        <img src="@Model.Owner.ProfileImageUrl" alt="@Model.Owner.Name" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />
+                    }
+                    else
+                    {
+                        @(string.IsNullOrEmpty(Model.Owner?.Name) ? "O" : Model.Owner.Name.Substring(0, 1).ToUpper())
+                    }
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">Owned by @Model.Owner?.Name</h6>
+                    <small style="color: var(--sb-text-muted);">Verified Vendor <i class="bi bi-patch-check-fill ms-1" style="color: var(--sb-primary);"></i></small>
+                </div>
+            </div>
+
+            @if (isLoggedIn && Model.Status == "Approved")
+            {
+                <a asp-controller="Booking" asp-action="Book" asp-route-listingId="@Model.Id"
+                   class="btn btn-primary btn-lg w-100 py-3 rounded-3 fw-bold" style="font-size: 1.1rem;">
+                    <i class="bi bi-calendar-check me-2"></i>Book Now
+                </a>
+                
+                @if (Model.OwnerId != int.Parse(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"))
+                {
+                    <button type="button" class="btn btn-outline-secondary btn-lg w-100 py-3 mt-3 rounded-3 fw-bold open-chat-btn"
+                            data-owner-id="@Model.OwnerId" 
+                            data-owner-name="@Model.Owner?.Name"
+                            style="font-size: 1.1rem;">
+                        <i class="bi bi-chat-dots me-2"></i>Contact Seller
+                    </button>
+                }
+            }
+            else if (!isLoggedIn)
+            {
+                <a asp-controller="Auth" asp-action="Login"
+                   class="btn btn-primary btn-lg w-100 py-3 rounded-3 fw-bold">
+                    Log in to Book
+                </a>
+            }
+            else if (Model.Status != "Approved")
+            {
+                <button class="btn btn-secondary btn-lg w-100 py-3 rounded-3 fw-bold" disabled>
+                    Listing is @Model.Status
+                </button>
+            }
         </div>
+    </div>
+</div>

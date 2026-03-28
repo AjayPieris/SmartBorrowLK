@@ -1,31 +1,31 @@
 document.addEventListener("DOMContentLoaded", () => {
     const themeToggleBtn = document.getElementById("themeToggle");
-    const htmlElement = document.documentElement;
     const bodyElement = document.body;
-    
-    // Check saved theme or default to light
-    const currentTheme = localStorage.getItem("theme") || "light";
-    
-    if (currentTheme === "dark") {
-        bodyElement.classList.add("dark-mode");
-        if(themeToggleBtn) {
+
+    // Check saved theme or default to dark
+    const currentTheme = localStorage.getItem("sb-theme") || "dark";
+
+    if (currentTheme === "light") {
+        bodyElement.classList.add("light-mode");
+        if (themeToggleBtn) {
             themeToggleBtn.innerHTML = '<i class="bi bi-sun-fill"></i>';
         }
     } else {
-        if(themeToggleBtn) {
+        bodyElement.classList.remove("light-mode");
+        if (themeToggleBtn) {
             themeToggleBtn.innerHTML = '<i class="bi bi-moon-fill"></i>';
         }
     }
-    
+
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener("click", () => {
-            bodyElement.classList.toggle("dark-mode");
-            
-            if (bodyElement.classList.contains("dark-mode")) {
-                localStorage.setItem("theme", "dark");
+            bodyElement.classList.toggle("light-mode");
+
+            if (bodyElement.classList.contains("light-mode")) {
+                localStorage.setItem("sb-theme", "light");
                 themeToggleBtn.innerHTML = '<i class="bi bi-sun-fill"></i>';
             } else {
-                localStorage.setItem("theme", "light");
+                localStorage.setItem("sb-theme", "dark");
                 themeToggleBtn.innerHTML = '<i class="bi bi-moon-fill"></i>';
             }
         });

@@ -10,21 +10,27 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 </head>
-
 <body>
+    @using Microsoft.Extensions.Configuration
+    @inject IConfiguration Configuration
     @{
         var userName = User.Identity?.Name;
         var userRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
         var userEmail = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value ??
-    (userName != null ? $"{userName.Replace(" ", "").ToLower()}@example.com" : "");
+            (userName != null ? $"{userName.Replace(" ", "").ToLower()}@@example.com" : "");
         var userProfileImage = User.Claims.FirstOrDefault(c => c.Type == "ProfileImage")?.Value;
         var isLoggedIn = User.Identity?.IsAuthenticated == true;
         var isAdmin = userRole?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
         var isVendor = userRole?.Equals("Vendor", StringComparison.OrdinalIgnoreCase) == true;
-        
+
         string GetInitials(string? name)
         {
             if (string.IsNullOrEmpty(name)) return "U";
@@ -37,14 +43,15 @@
     <nav class="navbar navbar-expand-lg sb-navbar sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                <i class="bi bi-box-seam text-primary me-2"></i>
-                <span>SmartBorrow <span style="color: var(--sb-accent);">LK</span></span>
+                <i class="bi bi-box-seam me-2" style="color: var(--sb-primary); font-size: 1.3rem;"></i>
+                SmartBorrow<span style="color: var(--sb-accent); margin-left: 4px;">LK</span>
             </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -56,137 +63,181 @@
                     @if (isLoggedIn && isVendor)
                     {
                         <li class="nav-item">
+                            <a class="nav-link" asp-controller="Listing" asp-action="Create">List Gear</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" asp-controller="Listing" asp-action="MyListings">My Listings</a>
                         </li>
                     }
                     @if (isLoggedIn && isAdmin)
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-primary fw-semibold" asp-controller="Admin" asp-action="Dashboard">Admin
-                                Dashboard</a>
-                            </li>
-                        }
-                    </ul>
-                
-                    <div class="d-flex align-items-center ms-auto">
-                        <button id="themeToggle" class="theme-toggle me-3" aria-label="Toggle Theme">
-                            <i class="bi bi-moon-fill"></i>
-                        </button>
-                        @if (isLoggedIn)
-                        {
-                            <a href="#" class="notification-icon" aria-label="Notifications">
-                                <i class="bi bi-bell"></i>
+                            <a class="nav-link" asp-controller="Admin" asp-action="Dashboard"
+                               style="color: var(--sb-primary); font-weight: 700;">
+                                <i class="bi bi-speedometer2 me-1"></i>Admin
                             </a>
-                        
-                            <div class="dropdown">
-                                <button class="profile-btn dropdown-toggle" type="button" id="profileDropdown"
-                                        data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,15">
-                                    <div class="profile-avatar">
-                                        @if (!string.IsNullOrEmpty(userProfileImage))
-                                        {
-                                            <img src="@userProfileImage" alt="@userName"
-                                                 style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
-                                        }
-                                        else
-                                        {
-                                            @GetInitials(userName)
-                                        }
-                                    </div>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom"
-                                    aria-labelledby="profileDropdown">
-                                    <li class="dropdown-user-info">
-                                        <p class="dropdown-user-name">@userName</p>
-                                        <p class="dropdown-user-email">@userEmail</p>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    @if (isAdmin)
+                        </li>
+                    }
+                </ul>
+
+                <div class="d-flex align-items-center gap-2 ms-auto">
+                    <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme">
+                        <i class="bi bi-moon-fill"></i>
+                    </button>
+
+                    @if (isLoggedIn)
+                    {
+                        <a href="#" class="notification-icon" aria-label="Notifications">
+                            <i class="bi bi-bell"></i>
+                        </a>
+
+                        <a href="javascript:void(0)" class="chat-icon ms-2 me-3 position-relative" id="navbarChatBtn" aria-label="Chat">
+                            <i class="bi bi-chat-dots fs-5"></i>
+                            <span id="globalChatBadge" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none">
+                                <span class="visually-hidden">New alerts</span>
+                            </span>
+                        </a>
+
+                        <div class="dropdown">
+                            <button class="profile-btn dropdown-toggle" type="button" id="profileDropdown"
+                                    data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,12">
+                                <div class="profile-avatar">
+                                    @if (!string.IsNullOrEmpty(userProfileImage))
                                     {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
-                                                <i class="bi bi-speedometer2"></i> Dashboard
-                                            </a>
-                                        </li>
+                                        <img src="@userProfileImage" alt="@userName"
+                                             style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
                                     }
-                                    @if (isVendor)
+                                    else
                                     {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Listing" asp-action="MyListings">
-                                                <i class="bi bi-collection"></i> My Listings
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Booking" asp-action="Requests">
-                                                <i class="bi bi-inboxes"></i> Booking Requests
-                                            </a>
-                                        </li>
+                                        @GetInitials(userName)
                                     }
+                                </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom"
+                                aria-labelledby="profileDropdown">
+                                <li class="dropdown-user-info">
+                                    <p class="dropdown-user-name">@userName</p>
+                                    <p class="dropdown-user-email">@userEmail</p>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                @if (isAdmin)
+                                {
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Booking" asp-action="MyBookings">
-                                            <i class="bi bi-calendar-check"></i> My Bookings
+                                        <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
+                                            <i class="bi bi-speedometer2"></i> Dashboard
+                                        </a>
+                                    </li>
+                                }
+                                @if (isVendor)
+                                {
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Listing" asp-action="MyListings">
+                                            <i class="bi bi-collection"></i> My Listings
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#">
-                                            <i class="bi bi-gear"></i> Settings
+                                        <a class="dropdown-item" asp-controller="Booking" asp-action="Requests">
+                                            <i class="bi bi-inboxes"></i> Booking Requests
                                         </a>
                                     </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item logout-item" asp-controller="Auth" asp-action="Logout">
-                                            <i class="bi bi-box-arrow-right"></i> Logout
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        }
-                        else
-                        {
-                            <a class="nav-link px-3" asp-controller="Auth" asp-action="Login">Log in</a>
-                            <a class="btn btn-primary btn-sm ms-2 px-3 py-2 rounded-pill" asp-controller="Auth"
-                               asp-action="Register">Sign up</a>
-                        }
+                                }
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Booking" asp-action="MyBookings">
+                                        <i class="bi bi-calendar-check"></i> My Bookings
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item logout-item" asp-controller="Auth" asp-action="Logout">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="nav-link px-3" asp-controller="Auth" asp-action="Login"
+                           style="color: var(--sb-text-muted); font-weight: 600;">Log in</a>
+                        <a class="btn btn-primary btn-sm px-3 py-2 rounded-pill" asp-controller="Auth"
+                           asp-action="Register">Get Started</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="container mt-4">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    }
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <div>
+                    <div class="footer-brand">SmartBorrow LK</div>
+                    <p class="mb-0 small" style="color: var(--sb-text-dim);">&copy; 2026 SmartBorrow LK. All rights reserved.</p>
+                </div>
+                <div class="d-flex gap-4">
+                    <a href="#" style="color: var(--sb-text-dim); font-size: 0.82rem;">Privacy Policy</a>
+                    <a href="#" style="color: var(--sb-text-dim); font-size: 0.82rem;">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Global Chat Widget -->
+    @if (isLoggedIn)
+    {
+        <div class="chat-widget" id="globalChatWidget">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="chat-partner-avatar" id="chatPartnerAvatar">?</div>
+                    <div>
+                        <h4 class="chat-partner-name" id="chatPartnerName">Select a user</h4>
+                        <p class="chat-partner-status">Online</p>
                     </div>
                 </div>
+                <button class="chat-close-btn" id="closeChatBtn">&times;</button>
             </div>
-        </nav>
-
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="container mt-4">
-                <div class="alert alert-success alert-dismissible fade show border-0 rounded-3" role="alert"
-                     style="background-color: #DCFCE7; color: #166534;">
-                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <div class="chat-body" id="chatBody">
+                <div class="text-center text-muted mt-5 mb-5" style="font-size: 0.9rem;">Start a conversation</div>
             </div>
-        }
-
-        <main>
-            @RenderBody()
-        </main>
-
-        <footer>
-            <div class="container text-center">
-                <p class="mb-2 fw-semibold text-dark">SmartBorrow LK</p>
-                <p class="mb-0 small text-muted">&copy; 2026 SmartBorrow LK. All rights reserved.</p>
+            <div class="chat-footer">
+                <input type="text" class="chat-input" id="chatInputMessage" placeholder="Type a message..." maxlength="500" disabled />
+                <button class="chat-send-btn" id="chatSendBtn" disabled>
+                    <i class="bi bi-send-fill"></i>
+                </button>
             </div>
-        </footer>
+        </div>
 
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-        <script src="~/js/theme.js" asp-append-version="true"></script>
-        @await RenderSectionAsync("Scripts", required: false)
-    </body>
+        <script>
+            window.chatConfig = {
+                pusherKey: '@Configuration["NEXT_PUBLIC_PUSHER_KEY"]',
+                pusherCluster: '@Configuration["NEXT_PUBLIC_PUSHER_CLUSTER"]' || 'ap2',
+                currentUserId: @(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0")
+            };
+        </script>
+    }
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/theme.js" asp-append-version="true"></script>
+    @if(isLoggedIn){
+       <script src="~/js/chat.js" asp-append-version="true"></script>
+    }
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
 
 </html>
-
-
-
-
-

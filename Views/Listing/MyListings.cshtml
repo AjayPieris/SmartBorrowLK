@@ -1,43 +1,93 @@
 @model IEnumerable<SmartBorrowLK.Models.Listing>
 @{ ViewData["Title"] = "My Listings"; }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>My Listings</h2>
-        <a asp-action="Create" class="btn btn-success">+ New Listing</a>
+<div class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 gap-3 fade-in-up">
+        <div>
+            <h2 class="fw-bold mb-1" style="font-size: 2rem;">My Listings</h2>
+            <p style="color: var(--sb-text-muted); margin-bottom: 0;">Manage your rental gear</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary px-4 py-2 rounded-3 fw-bold">
+            <i class="bi bi-plus-circle me-2"></i>New Listing
+        </a>
     </div>
 
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Image</th>
-                <th>Item</th>
-                <th>AI Suggested Price/Day</th>
-                <th>Risk Score</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        <img src="@item.Item.ImageUrl" alt="@item.Item.Name" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" />
-                    </td>
-                    <td>@item.Item.Name</td>
-                    <td>Rs. @item.PricePerDay.ToString("N0")</td>
-                    <td>
-                        <span class="badge @(item.RiskScore < 30 ? "bg-success" : item.RiskScore < 70 ? "bg-warning" : "bg-danger")">
-                            @item.RiskScore / 100
-                        </span>
-                    </td>
-                    <td>
-                        <span class="badge @(item.Status == "Approved" ? "bg-success" : item.Status == "Pending" ? "bg-secondary" : "bg-danger")">
-                            @item.Status
-                        </span>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    @if (Model.Any())
+    {
+        <div class="glass-panel overflow-hidden fade-in-up delay-1">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Image</th>
+                            <th>Item</th>
+                            <th>Price / Day</th>
+                            <th>Risk Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    @if (!string.IsNullOrEmpty(item.Item?.ImageUrl))
+                                    {
+                                        <img src="@item.Item.ImageUrl" alt="@item.Item.Name"
+                                             style="width: 56px; height: 56px; object-fit: cover; border-radius: 10px; border: 1px solid var(--sb-outline);" />
+                                    }
+                                    else
+                                    {
+                                        <div style="width: 56px; height: 56px; border-radius: 10px; background: var(--sb-surface); display: flex; align-items: center; justify-content: center; color: var(--sb-text-dim);">
+                                            <i class="bi bi-camera"></i>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="fw-semibold">@item.Item?.Name</td>
+                                <td class="fw-bold">Rs. @item.PricePerDay.ToString("N0")</td>
+                                <td>
+                                    @{
+                                        var riskColor = item.RiskScore < 30 ? "var(--sb-success)" : item.RiskScore < 70 ? "var(--sb-warning)" : "var(--sb-error)";
+                                        var riskLabel = item.RiskScore < 30 ? "Low" : item.RiskScore < 70 ? "Medium" : "High";
+                                    }
+                                    <div style="width: 100px;">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span style="font-size: 0.68rem; font-weight: 700; color: @riskColor;">@riskLabel</span>
+                                            <span style="font-size: 0.68rem; font-weight: 700;">@item.RiskScore/100</span>
+                                        </div>
+                                        <div class="risk-bar-bg">
+                                            <div class="risk-bar-fill" style="width: @(item.RiskScore)%; background: @riskColor;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (item.Status == "Approved")
+                                    {
+                                        <span class="status-pill approved">Approved</span>
+                                    }
+                                    else if (item.Status == "Pending")
+                                    {
+                                        <span class="status-pill pending">Pending</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill rejected">Rejected</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state fade-in-up">
+            <i class="bi bi-collection"></i>
+            <h4 class="fw-bold mt-3 mb-2">No listings yet</h4>
+            <p style="color: var(--sb-text-muted);">Create your first listing to start earning!</p>
+            <a asp-action="Create" class="btn btn-primary px-4 py-2 rounded-3 mt-2">Create a Listing</a>
+        </div>
+    }
 </div>

@@ -1,351 +1,182 @@
 @model SmartBorrowLK.ViewModels.AdminDashboardViewModel
-@{ 
-    ViewData["Title"] = "Admin Dashboard"; 
-    // If you are putting the header/sidebar in a _Layout.cshtml, you can remove those sections below.
-    // For now, this is the complete standalone file with the new design.
-    Layout = null; 
+@{
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<!DOCTYPE html>
-<html class="dark" lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>@ViewData["Title"] | SmartBorrowLK</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "on-tertiary-container": "#ffffff",
-                        "outline": "#727581",
-                        "error-container": "#9f0519",
-                        "tertiary-container": "#7c4dff",
-                        "surface": "#0a0e17",
-                        "on-primary-container": "#004d57",
-                        "surface-container-low": "#0f131d",
-                        "primary-fixed": "#00e3fd",
-                        "surface-container-lowest": "#000000",
-                        "tertiary-fixed-dim": "#ab93ff",
-                        "tertiary-dim": "#7e51ff",
-                        "primary-dim": "#00d4ec",
-                        "on-secondary-fixed-variant": "#3e47a0",
-                        "secondary-fixed": "#cbceff",
-                        "tertiary": "#a68cff",
-                        "error": "#ff716c",
-                        "on-background": "#ebedfb",
-                        "secondary-container": "#343d96",
-                        "primary": "#81ecff",
-                        "surface-dim": "#0a0e17",
-                        "on-primary": "#005762",
-                        "surface-container-high": "#1a1f2c",
-                        "on-primary-fixed-variant": "#005762",
-                        "on-secondary": "#0b1574",
-                        "background": "#0a0e17",
-                        "primary-container": "#00e3fd",
-                        "inverse-surface": "#faf9ff",
-                        "on-surface": "#ebedfb",
-                        "primary-fixed-dim": "#00d4ec",
-                        "on-tertiary-fixed-variant": "#4000ad",
-                        "on-error": "#490006",
-                        "surface-bright": "#262c3a",
-                        "secondary": "#929bfa",
-                        "surface-container-highest": "#202633",
-                        "secondary-fixed-dim": "#babfff",
-                        "surface-variant": "#202633",
-                        "on-error-container": "#ffa8a3",
-                        "on-tertiary": "#25006b",
-                        "on-tertiary-fixed": "#1c0055",
-                        "on-secondary-fixed": "#1f2882",
-                        "on-surface-variant": "#a7abb7",
-                        "inverse-primary": "#006976",
-                        "on-primary-fixed": "#003840",
-                        "secondary-dim": "#8d96f4",
-                        "outline-variant": "#444852",
-                        "on-secondary-container": "#c9cdff",
-                        "surface-container": "#151925",
-                        "surface-tint": "#81ecff",
-                        "error-dim": "#d7383b",
-                        "inverse-on-surface": "#515560",
-                        "tertiary-fixed": "#b8a3ff"
-                    },
-                    fontFamily: {
-                        "headline": ["Space Grotesk"],
-                        "body": ["Inter"],
-                        "label": ["Inter"]
-                    },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
-                },
-            },
-        }
-    </script>
-    <style>
-        .glass-card {
-            background: rgba(26, 31, 44, 0.4);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(129, 236, 255, 0.1);
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-</head>
-<body class="bg-surface text-on-surface font-body selection:bg-primary/30">
-    
-    <header class="sticky top-0 z-50 flex items-center justify-between px-8 h-16 w-full bg-[#0a0e17]/80 backdrop-blur-xl border-b border-[#444852]/20">
-        <div class="flex items-center gap-8">
-            <span class="text-2xl font-bold tracking-tighter text-[#81ecff] font-headline">SmartBorrowLK</span>
-            <div class="hidden md:flex items-center gap-6 font-headline text-sm tracking-tight">
-                <a class="text-[#81ecff] font-bold border-b-2 border-[#81ecff] pb-1" href="#">Dashboard</a>
-                <a class="text-[#a7abb7] hover:text-[#ebedfb] transition-colors" href="#">Listings</a>
-                <a class="text-[#a7abb7] hover:text-[#ebedfb] transition-colors" href="#">Analytics</a>
+<div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar d-none d-lg-flex">
+        <div class="sidebar-title">Admin Central</div>
+        <div class="sidebar-subtitle">AI-Risk Verified</div>
+        <nav>
+            <a class="sidebar-link active" href="#">
+                <span class="material-symbols-outlined" style="font-size: 1.2rem;">dashboard</span>
+                Dashboard
+            </a>
+            <a class="sidebar-link" asp-controller="Listing" asp-action="Index">
+                <span class="material-symbols-outlined" style="font-size: 1.2rem;">list_alt</span>
+                Listings
+            </a>
+            <a class="sidebar-link" href="#">
+                <span class="material-symbols-outlined" style="font-size: 1.2rem;">group</span>
+                Users
+            </a>
+            <a class="sidebar-link" href="#">
+                <span class="material-symbols-outlined" style="font-size: 1.2rem;">settings</span>
+                Settings
+            </a>
+        </nav>
+        <div class="mt-auto">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary w-100 py-2 fw-bold" style="font-size: 0.85rem;">
+                <i class="bi bi-arrow-left me-1"></i> Back to Site
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+        <div class="mb-5 fade-in-up">
+            <div class="hero-tag" style="margin-bottom: 1rem;">
+                <span class="material-symbols-outlined" style="font-size: 14px;">shield</span>
+                Admin Access
+            </div>
+            <h1 class="fw-bold mb-2" style="font-size: 2.5rem; letter-spacing: -0.02em;">Dashboard Overview</h1>
+            <p style="color: var(--sb-text-muted); font-size: 1.05rem;">Platform statistics and pending approvals</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="row g-3 mb-5 fade-in-up delay-1">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-glow" style="background: var(--sb-primary);"></div>
+                    <div class="stat-card-label">Total Listings</div>
+                    <div class="stat-card-value" style="color: var(--sb-text);">@Model.TotalListings</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card" style="border-top-color: rgba(166, 140, 255, 0.3);">
+                    <div class="stat-glow" style="background: var(--sb-accent);"></div>
+                    <div class="stat-card-label">Pending Review</div>
+                    <div class="stat-card-value" style="color: var(--sb-accent-light);">@Model.PendingListingsCount</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card" style="border-top-color: rgba(129, 236, 255, 0.3);">
+                    <div class="stat-glow" style="background: var(--sb-primary);"></div>
+                    <div class="stat-card-label">Approved</div>
+                    <div class="stat-card-value" style="color: var(--sb-primary);">@Model.ApprovedListingsCount</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card" style="border-top-color: rgba(255, 113, 108, 0.3);">
+                    <div class="stat-glow" style="background: var(--sb-error);"></div>
+                    <div class="stat-card-label">Rejected</div>
+                    <div class="stat-card-value" style="color: var(--sb-error);">@Model.RejectedListingsCount</div>
+                </div>
             </div>
         </div>
-        <div class="flex items-center gap-4">
-            <button class="p-2 text-[#a7abb7] hover:bg-[#1a1f2c]/50 transition-all rounded-full active:scale-95">
-                <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-            </button>
-            <button class="p-2 text-[#a7abb7] hover:bg-[#1a1f2c]/50 transition-all rounded-full active:scale-95">
-                <span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
-            </button>
-            <div class="h-8 w-8 rounded-full bg-surface-bright border border-outline-variant/30 overflow-hidden">
-                <img alt="Admin profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxdaGb1WQPGjLebsg51_1OiiyJ3ZSLPgUF13WO4Mgjc2lbdCv4rSBeklyHXOXKtEV8nnlsHRtHdHH-5GzcoPW_mT29t9L_-dPDq_5f11F-OLbvYaB4VxXtI9QmJt64Qo42aOLqnKl5Oyg7CsZdGwGtw3Dfb7QDzJUWbs-14Gx_PwrlKYoWMEoYETwKFaQ1ecjInfYY6e2MYUTtkUZJ6NIx2Ew7RXkq3Yzb46pTelgFD0oWAln-XIG5Ud7892LbzcP-AhmVbPp_650"/>
-            </div>
-        </div>
-    </header>
 
-    <div class="flex">
-        <aside class="h-screen w-64 fixed left-0 top-0 pt-20 border-r border-[#444852]/10 bg-[#0f131d] hidden lg:flex flex-col p-4 gap-2 z-40">
-            <div class="px-4 mb-6">
-                <h3 class="text-[#81ecff] font-headline font-bold text-lg">Admin Central</h3>
-                <p class="text-[#a7abb7] text-xs font-medium">AI-Risk Verified</p>
-            </div>
-            <nav class="flex flex-col gap-1">
-                <a class="flex items-center gap-3 px-4 py-3 text-[#81ecff] bg-[#1a1f2c] rounded-lg shadow-[0_0_15px_rgba(129,236,255,0.1)] transition-transform duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                    <span class="font-['Inter'] text-[0.875rem] font-medium">Dashboard</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-[#a7abb7] hover:text-[#ebedfb] hover:bg-[#1a1f2c]/40 rounded-lg hover:translate-x-1 transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
-                    <span class="font-['Inter'] text-[0.875rem] font-medium">Loan Listings</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-[#a7abb7] hover:text-[#ebedfb] hover:bg-[#1a1f2c]/40 rounded-lg hover:translate-x-1 transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="psychology">psychology</span>
-                    <span class="font-['Inter'] text-[0.875rem] font-medium">Risk Analysis</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-[#a7abb7] hover:text-[#ebedfb] hover:bg-[#1a1f2c]/40 rounded-lg hover:translate-x-1 transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="group">group</span>
-                    <span class="font-['Inter'] text-[0.875rem] font-medium">Users</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-[#a7abb7] hover:text-[#ebedfb] hover:bg-[#1a1f2c]/40 rounded-lg hover:translate-x-1 transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
-                    <span class="font-['Inter'] text-[0.875rem] font-medium">Lenders</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-[#a7abb7] hover:text-[#ebedfb] hover:bg-[#1a1f2c]/40 rounded-lg hover:translate-x-1 transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="settings">settings</span>
-                    <span class="font-['Inter'] text-[0.875rem] font-medium">Settings</span>
-                </a>
-            </nav>
-            <div class="mt-auto p-4 bg-surface-container-high rounded-xl border border-outline-variant/10">
-                <button class="w-full py-2 bg-gradient-to-br from-primary to-primary-dim text-on-primary-fixed font-bold rounded-lg active:scale-95 transition-all text-sm">
-                    Generate Report
-                </button>
-            </div>
-        </aside>
-
-        <main class="flex-1 lg:ml-64 p-8 min-h-screen bg-surface">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-                <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-4 uppercase tracking-widest">
-                        <span class="material-symbols-outlined text-sm" data-icon="shield">shield</span>
-                        Admin Access
-                    </div>
-                    <h1 class="text-5xl font-bold font-headline tracking-tighter text-on-background mb-2">Dashboard Overview</h1>
-                    <p class="text-on-surface-variant text-lg">Platform statistics and pending approvals</p>
+        <!-- Pending Table -->
+        <div class="glass-panel overflow-hidden fade-in-up delay-2">
+            <div class="p-4 d-flex align-items-center justify-content-between" style="border-bottom: 1px solid rgba(68,72,82,0.15);">
+                <div class="d-flex align-items-center gap-3">
+                    <h4 class="fw-bold mb-0">Action Required</h4>
+                    <span class="status-pill pending">@Model.PendingListings.Count Pending</span>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-8 -mt-8 blur-2xl group-hover:bg-primary/10 transition-all"></div>
-                    <div class="flex flex-col">
-                        <span class="text-on-surface-variant text-sm font-medium mb-1">Total Listings</span>
-                        <span class="text-4xl font-bold font-headline text-on-background">@Model.TotalListings</span>
-                    </div>
-                </div>
-
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden border-t-2 border-t-tertiary/20">
-                    <div class="flex flex-col">
-                        <span class="text-on-surface-variant text-sm font-medium mb-1">Pending Review</span>
-                        <span class="text-4xl font-bold font-headline text-tertiary">@Model.PendingListingsCount</span>
-                    </div>
-                </div>
-
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden border-t-2 border-t-primary/20">
-                    <div class="flex flex-col">
-                        <span class="text-on-surface-variant text-sm font-medium mb-1">Approved</span>
-                        <span class="text-4xl font-bold font-headline text-primary">@Model.ApprovedListingsCount</span>
-                    </div>
-                </div>
-
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden border-t-2 border-t-error/20">
-                    <div class="flex flex-col">
-                        <span class="text-on-surface-variant text-sm font-medium mb-1">Rejected</span>
-                        <span class="text-4xl font-bold font-headline text-error">@Model.RejectedListingsCount</span>
-                    </div>
-                </div>
-            </div>
-
-            <section class="glass-card rounded-2xl overflow-hidden border border-outline-variant/10">
-                <div class="p-8 border-b border-outline-variant/10 flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <h2 class="text-2xl font-bold font-headline">Action Required</h2>
-                        <span class="px-3 py-1 bg-tertiary/10 text-tertiary text-xs font-bold rounded-full border border-tertiary/20">@Model.PendingListings.Count Pending</span>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-surface-container-low/50">
-                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Item Details</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Vendor</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Price / Day</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">AI Risk Score</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Status</th>
-                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant text-right">Actions</th>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Item Details</th>
+                            <th>Vendor</th>
+                            <th>Price / Day</th>
+                            <th>AI Risk Score</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.PendingListings.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5" style="color: var(--sb-text-muted);">
+                                    <span class="material-symbols-outlined d-block mb-2" style="font-size: 2.5rem; opacity: 0.4;">check_circle</span>
+                                    All clear! No listings require review at the moment.
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="divide-y divide-outline-variant/5">
-                            
-                            @if (!Model.PendingListings.Any())
-                            {
-                                <tr>
-                                    <td colspan="6" class="px-8 py-12 text-center text-on-surface-variant">
-                                        <span class="material-symbols-outlined text-4xl mb-3 opacity-50 block" data-icon="check_circle">check_circle</span>
-                                        All clear! No listings require review at the moment.
-                                    </td>
-                                </tr>
-                            }
+                        }
 
-                            @foreach (var listing in Model.PendingListings)
-                            {
-                                // Tailwind logic for risk score colors
-                                var riskTextClass = listing.RiskScore > 75 ? "text-error" : (listing.RiskScore > 40 ? "text-tertiary" : "text-primary");
-                                var riskBgClass = listing.RiskScore > 75 ? "bg-error" : (listing.RiskScore > 40 ? "bg-tertiary" : "bg-primary");
-                                var riskShadow = listing.RiskScore > 75 ? "rgba(255,113,108,0.5)" : (listing.RiskScore > 40 ? "rgba(166,140,255,0.5)" : "rgba(129,236,255,0.5)");
-                                var riskLabel = listing.RiskScore > 75 ? "High Risk" : (listing.RiskScore > 40 ? "Medium Risk" : "Low Risk");
+                        @foreach (var listing in Model.PendingListings)
+                        {
+                            var riskColor = listing.RiskScore > 75 ? "var(--sb-error)" : (listing.RiskScore > 40 ? "var(--sb-warning)" : "var(--sb-primary)");
+                            var riskLabel = listing.RiskScore > 75 ? "High Risk" : (listing.RiskScore > 40 ? "Medium Risk" : "Low Risk");
 
-                                <tr class="hover:bg-surface-container-high/40 transition-colors">
-                                    <td class="px-8 py-6">
-                                        <div class="flex items-center gap-4">
-                                            @if (!string.IsNullOrEmpty(listing.Item?.ImageUrl))
-                                            {
-                                                <div class="w-14 h-14 rounded-xl bg-surface-container-highest flex-shrink-0 overflow-hidden border border-outline-variant/20">
-                                                    <img class="w-full h-full object-cover" src="@listing.Item.ImageUrl" alt="@listing.Item.Name" />
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="w-14 h-14 rounded-xl bg-surface-container-highest flex-shrink-0 flex items-center justify-center border border-outline-variant/20 text-on-surface-variant">
-                                                    <span class="material-symbols-outlined" data-icon="photo_camera">photo_camera</span>
-                                                </div>
-                                            }
-                                            
-                                            <div>
-                                                <h4 class="font-bold text-on-background">@listing.Item?.Name</h4>
-                                                <p class="text-xs text-on-surface-variant">ID: #@listing.Id • <span class="opacity-80">@listing.Item?.Condition</span></p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-6">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-sm font-medium">@listing.Owner?.Name</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-6">
-                                        <span class="text-sm font-bold font-headline">Rs. @listing.PricePerDay.ToString("N0")</span>
-                                    </td>
-                                    <td class="px-6 py-6">
-                                        <div class="w-32">
-                                            <div class="flex items-center justify-between mb-1">
-                                                <span class="text-[10px] font-bold @riskTextClass">@riskLabel</span>
-                                                <span class="text-[10px] font-bold text-on-surface">@listing.RiskScore/100</span>
-                                            </div>
-                                            <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
-                                                <div class="h-full @riskBgClass shadow-[0_0_8px_@riskShadow]" style="width: @listing.RiskScore%"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-6">
-                                        @if(listing.Status == "Pending")
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        @if (!string.IsNullOrEmpty(listing.Item?.ImageUrl))
                                         {
-                                            <span class="px-2.5 py-1 rounded-full bg-tertiary/10 text-tertiary text-[10px] font-bold border border-tertiary/20">PENDING</span>
-                                        }
-                                        else if(listing.Status == "Approved")
-                                        {
-                                            <span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold border border-primary/20">APPROVED</span>
+                                            <img src="@listing.Item.ImageUrl" alt="@listing.Item.Name"
+                                                 style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1px solid var(--sb-outline);" />
                                         }
                                         else
                                         {
-                                            <span class="px-2.5 py-1 rounded-full bg-error/10 text-error text-[10px] font-bold border border-error/20">REJECTED</span>
+                                            <div style="width: 48px; height: 48px; border-radius: 10px; background: var(--sb-surface); display: flex; align-items: center; justify-content: center; color: var(--sb-text-dim);">
+                                                <span class="material-symbols-outlined">photo_camera</span>
+                                            </div>
                                         }
-                                    </td>
-                                    <td class="px-8 py-6 text-right">
-                                        <div class="flex items-center justify-end gap-2">
-                                            @if (listing.Status == "Pending")
-                                            {
-                                                <form asp-action="Approve" method="post" class="m-0">
-                                                    <input type="hidden" name="id" value="@listing.Id" />
-                                                    <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-all active:scale-90" title="Approve">
-                                                        <span class="material-symbols-outlined text-lg" data-icon="check">check</span>
-                                                    </button>
-                                                </form>
-                                                <form asp-action="Reject" method="post" class="m-0">
-                                                    <input type="hidden" name="id" value="@listing.Id" />
-                                                    <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error hover:text-on-error transition-all active:scale-90" title="Reject">
-                                                        <span class="material-symbols-outlined text-lg" data-icon="close">close</span>
-                                                    </button>
-                                                </form>
-                                            }
-                                            <a asp-controller="Listing" asp-action="Details" asp-route-id="@listing.Id" class="w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-background transition-all" title="View Details">
-                                                <span class="material-symbols-outlined text-lg" data-icon="visibility">visibility</span>
-                                            </a>
+                                        <div>
+                                            <div class="fw-bold">@listing.Item?.Name</div>
+                                            <div class="small" style="color: var(--sb-text-dim);">ID: #@listing.Id • @listing.Item?.Condition</div>
                                         </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <div class="h-20 lg:hidden"></div>
-        </main>
+                                    </div>
+                                </td>
+                                <td class="fw-medium">@listing.Owner?.Name</td>
+                                <td class="fw-bold">Rs. @listing.PricePerDay.ToString("N0")</td>
+                                <td>
+                                    <div style="width: 110px;">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span style="font-size: 0.65rem; font-weight: 700; color: @riskColor;">@riskLabel</span>
+                                            <span style="font-size: 0.65rem; font-weight: 700;">@listing.RiskScore/100</span>
+                                        </div>
+                                        <div class="risk-bar-bg">
+                                            <div class="risk-bar-fill" style="width: @(listing.RiskScore)%; background: @riskColor;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-pill pending">Pending</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex align-items-center justify-content-end gap-1">
+                                        @if (listing.Status == "Pending")
+                                        {
+                                            <form asp-action="Approve" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@listing.Id" />
+                                                <button type="submit" class="action-btn action-btn-approve" title="Approve">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </button>
+                                            </form>
+                                            <form asp-action="Reject" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@listing.Id" />
+                                                <button type="submit" class="action-btn action-btn-reject" title="Reject">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        <a asp-controller="Listing" asp-action="Details" asp-route-id="@listing.Id"
+                                           class="action-btn action-btn-view" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0a0e17]/90 backdrop-blur-xl border-t border-[#444852]/20 z-50 flex items-center justify-around px-4">
-        <a class="flex flex-col items-center gap-1 text-[#81ecff]" href="#">
-            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-            <span class="text-[10px] font-medium">Dash</span>
-        </a>
-        <a class="flex flex-col items-center gap-1 text-[#a7abb7]" href="#">
-            <span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
-            <span class="text-[10px] font-medium">Listings</span>
-        </a>
-        <a class="flex flex-col items-center gap-1 text-[#a7abb7]" href="#">
-            <span class="material-symbols-outlined" data-icon="psychology">psychology</span>
-            <span class="text-[10px] font-medium">Risk</span>
-        </a>
-        <a class="flex flex-col items-center gap-1 text-[#a7abb7]" href="#">
-            <span class="material-symbols-outlined" data-icon="settings">settings</span>
-            <span class="text-[10px] font-medium">Set</span>
-        </a>
-    </nav>
-
-</body>
-</html>
+</div>

@@ -1,289 +1,97 @@
-<!DOCTYPE html>
+@model IEnumerable<SmartBorrowLK.Models.Listing>
+@{
+    ViewData["Title"] = "Browse Listings";
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+}
 
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SmartBorrowLK | Rent Smart. Earn Easy.</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "on-primary-fixed-variant": "#005762",
-              "tertiary-fixed": "#b8a3ff",
-              "primary": "#81ecff",
-              "secondary": "#929bfa",
-              "secondary-fixed-dim": "#babfff",
-              "primary-fixed-dim": "#00d4ec",
-              "on-surface-variant": "#a7abb7",
-              "tertiary-container": "#7c4dff",
-              "on-error": "#490006",
-              "background": "#0a0e17",
-              "on-tertiary-container": "#ffffff",
-              "surface-container": "#151925",
-              "tertiary-fixed-dim": "#ab93ff",
-              "error-dim": "#d7383b",
-              "surface-bright": "#262c3a",
-              "tertiary-dim": "#7e51ff",
-              "error-container": "#9f0519",
-              "on-tertiary": "#25006b",
-              "inverse-on-surface": "#515560",
-              "surface-dim": "#0a0e17",
-              "inverse-primary": "#006976",
-              "surface-container-lowest": "#000000",
-              "on-primary": "#005762",
-              "error": "#ff716c",
-              "surface-variant": "#202633",
-              "secondary-fixed": "#cbceff",
-              "on-secondary-fixed": "#1f2882",
-              "surface-container-highest": "#202633",
-              "on-secondary-fixed-variant": "#3e47a0",
-              "tertiary": "#a68cff",
-              "outline": "#727581",
-              "surface-container-low": "#0f131d",
-              "primary-fixed": "#00e3fd",
-              "on-tertiary-fixed": "#1c0055",
-              "outline-variant": "#444852",
-              "on-error-container": "#ffa8a3",
-              "on-secondary-container": "#c9cdff",
-              "on-primary-container": "#004d57",
-              "secondary-container": "#343d96",
-              "on-background": "#ebedfb",
-              "inverse-surface": "#faf9ff",
-              "on-secondary": "#0b1574",
-              "secondary-dim": "#8d96f4",
-              "primary-dim": "#00d4ec",
-              "surface": "#0a0e17",
-              "surface-tint": "#81ecff",
-              "on-tertiary-fixed-variant": "#4000ad",
-              "on-primary-fixed": "#003840",
-              "surface-container-high": "#1a1f2c",
-              "on-surface": "#ebedfb",
-              "primary-container": "#00e3fd"
-            },
-            fontFamily: {
-              "headline": ["Space Grotesk"],
-              "body": ["Inter"],
-              "label": ["Inter"]
-            },
-            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
-          },
-        },
-      }
-    </script>
-<style>
-        body {
-            background-color: #0a0e17;
-            color: #ebedfb;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-        .glass-panel {
-            background: rgba(32, 38, 51, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .hero-gradient {
-            background: radial-gradient(circle at 50% 50%, rgba(129, 236, 255, 0.08) 0%, rgba(10, 14, 23, 0) 70%);
-        }
-    </style>
-</head>
-<body class="dark bg-background text-on-background selection:bg-primary/30">
-<!-- TopNavBar -->
-<nav class="fixed top-0 w-full z-50 bg-slate-950/40 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]">
-<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
-<div class="text-2xl font-bold bg-gradient-to-br from-cyan-400 to-cyan-600 bg-clip-text text-transparent font-['Space_Grotesk'] tracking-tight">
-                SmartBorrowLK
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end mb-5 gap-3 fade-in-up">
+        <div>
+            <div class="hero-tag" style="margin-bottom: 1rem;">
+                <span class="dot"></span>
+                Marketplace
             </div>
-<div class="hidden md:flex items-center space-x-8 font-['Space_Grotesk'] tracking-tight">
-<a class="text-cyan-400 font-bold border-b-2 border-cyan-400 pb-1" href="#">Explore</a>
-<a class="text-slate-400 hover:text-slate-100 transition-colors hover:bg-white/5 px-3 py-1 rounded-lg" href="#">How it Works</a>
-<a class="text-slate-400 hover:text-slate-100 transition-colors hover:bg-white/5 px-3 py-1 rounded-lg" href="#">Security</a>
-<a class="text-slate-400 hover:text-slate-100 transition-colors hover:bg-white/5 px-3 py-1 rounded-lg" href="#">Pricing</a>
-</div>
-<button class="active:scale-95 transform transition-transform bg-gradient-to-br from-primary to-primary-dim text-on-primary-fixed font-bold px-6 py-2 rounded-xl shadow-[0_0_20px_rgba(129,236,255,0.3)] hover:shadow-[0_0_30px_rgba(129,236,255,0.5)] transition-all">
-                Launch App
-            </button>
-</div>
-</nav>
-<main class="relative pt-24">
-<!-- Hero Section -->
-<section class="relative min-h-[921px] flex items-center overflow-hidden px-6">
-<div class="hero-gradient absolute inset-0 z-0"></div>
-<div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
-<div class="space-y-8">
-<div class="inline-flex items-center px-3 py-1 rounded-full bg-surface-variant/50 border border-primary/20 text-primary text-xs font-medium tracking-widest uppercase mb-4">
-<span class="mr-2">●</span> The Future of Access
-                    </div>
-<h1 class="text-6xl md:text-8xl font-headline font-bold leading-none tracking-tighter">
-                        Rent <span class="text-primary italic">Smart.</span><br/>
-                        Earn <span class="text-tertiary">Easy.</span>
-</h1>
-<p class="text-on-surface-variant text-xl md:text-2xl font-light leading-relaxed max-w-xl">
-                        Experience the first AI-powered tech rental ecosystem. Securely borrow elite hardware or monetize your idle gear with kinetic-speed logistics.
-                    </p>
-<div class="flex flex-wrap gap-4 pt-4">
-<button class="bg-gradient-to-br from-primary to-primary-dim text-on-primary px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-transform active:scale-95 shadow-lg shadow-primary/20">
-                            Browse Items
-                        </button>
-<button class="bg-surface-container-highest text-primary px-8 py-4 rounded-xl font-bold text-lg hover:bg-surface-bright transition-colors active:scale-95">
-                            Become a Vendor
-                        </button>
-</div>
-</div>
-<div class="relative group">
-<div class="absolute -inset-1 bg-gradient-to-r from-primary/30 to-tertiary/30 rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition duration-1000"></div>
-<div class="relative bg-surface-container-high rounded-3xl overflow-hidden aspect-square border border-white/5">
-<img alt="Futuristic Drone" class="w-full h-full object-cover mix-blend-lighten opacity-80" data-alt="Sleek modern black drone hovering against a dark minimalist studio background with teal and purple neon highlights reflecting on its surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUqeSAF2DV2lbL6_RUAy9dYdRgYLKmm2MbtilfbJW8mYuEQpedsa2L44riRXqSyDBZd_onF-YhioQUjzx2QDQ9qwCRjhFXsorr3t_z3fLpTRvqpYcf8c-2LVhS86Imj9W0zOCgrWy14xYF9jRiC5Jbwz6Q1lmnEbnDPtsfBHn6LHt2tj5kU0_MwAt35lFolLUdpr9aGbjE2u5TvhLjmtKNLEdXNvP2I6uAZ0QSGrhFdjY3CNtybVt58ScEmQYB41lwXoJO5nqwOKM"/>
-<div class="absolute bottom-6 left-6 right-6 glass-panel p-6 rounded-2xl border border-white/10">
-<div class="flex justify-between items-end">
-<div>
-<p class="text-on-surface-variant text-sm font-medium mb-1 tracking-wider uppercase">Active Listing</p>
-<h3 class="text-xl font-bold font-headline">DJI Mavic 3 Pro</h3>
-</div>
-<div class="text-right">
-<p class="text-primary font-bold text-lg">$45<span class="text-xs text-on-surface-variant font-normal">/day</span></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- How It Works Section -->
-<section class="py-32 px-6 bg-surface-container-low/30">
-<div class="max-w-7xl mx-auto">
-<div class="mb-20 space-y-4">
-<h2 class="text-4xl md:text-5xl font-headline font-bold text-center">Seamless Ecosystem</h2>
-<p class="text-on-surface-variant text-center max-w-2xl mx-auto text-lg">Our proprietary tech-stack manages the complexity, so you can focus on the creativity.</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-<!-- AI Auto-Listings -->
-<div class="p-8 rounded-2xl bg-surface-container-high border-t border-primary/10 hover:border-primary/40 transition-all group">
-<div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-primary text-3xl" data-icon="auto_awesome" data-weight="fill" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-</div>
-<h3 class="text-2xl font-headline font-bold mb-4">AI Auto-Listings</h3>
-<p class="text-on-surface-variant leading-relaxed">Simply upload a photo. Our neural vision engine generates optimized specs, pricing, and descriptions instantly.</p>
-</div>
-<!-- Smart Risk Scoring -->
-<div class="p-8 rounded-2xl bg-surface-container-high border-t border-tertiary/10 hover:border-tertiary/40 transition-all group">
-<div class="w-14 h-14 rounded-xl bg-tertiary/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-tertiary text-3xl" data-icon="shield_with_heart" data-weight="fill" style="font-variation-settings: 'FILL' 1;">shield_with_heart</span>
-</div>
-<h3 class="text-2xl font-headline font-bold mb-4">Smart Risk Scoring</h3>
-<p class="text-on-surface-variant leading-relaxed">Integrated trust metrics ensure your gear is only handled by verified, high-rated professionals within our network.</p>
-</div>
-<!-- Easy Booking -->
-<div class="p-8 rounded-2xl bg-surface-container-high border-t border-secondary/10 hover:border-secondary/40 transition-all group">
-<div class="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-secondary text-3xl" data-icon="bolt" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bolt</span>
-</div>
-<h3 class="text-2xl font-headline font-bold mb-4">Easy Booking</h3>
-<p class="text-on-surface-variant leading-relaxed">One-tap rentals with integrated insurance and kinetic delivery tracking for a frictionless experience.</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Bento Grid Tech Showcase -->
-<section class="py-32 px-6 max-w-7xl mx-auto">
-<div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-full md:h-[600px]">
-<div class="md:col-span-2 md:row-span-2 bg-surface-container-high rounded-3xl relative overflow-hidden group">
-<img alt="Premium Laptop" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" data-alt="Close up of a premium silver laptop keyboard and trackpad in a moody dark environment with soft cool blue backlighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-gu-HcMc87A_Jp0q22Vc8LkVqUunfD1jx3rh__t8I_-z8Q23Lc0NOb89NBQdUGhMYljiIC0GNOB1caOzeWXABZBvurWa8VPf1ebZj13O5LgnTsz2N0oBdN-v5uZsclCGrVdvTpB_jGTuu0I8q0SpTKZwiZa3pLNtF4rYclfhfdofM7b6JKeaH6I9XrUOnrQPtMhTtD_unHLd0i2z3dpIuWO56CFX3tio6eilYc3ENWyd9wmLVrUMVUezpoz40btyngWmeHmHXwBY"/>
-<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
-<div class="absolute bottom-8 left-8">
-<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold mb-4 inline-block">MOST WANTED</span>
-<h3 class="text-3xl font-headline font-bold">MacBook Pro M3 Max</h3>
-</div>
-</div>
-<div class="md:col-span-2 md:row-span-1 bg-surface-container-high rounded-3xl relative overflow-hidden group">
-<img alt="Cinema Gear" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" data-alt="Professional cinema camera with high-end lens and external monitor rigged for filming in a dark studio setting with cinematic rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkZLm48b2zIOHIIgWaP6ayES1ELk8q82U5-5gvYmSec2IHej4aNU9Bpm_hHypDFjm_ejSprsKzeEHteaKVN2jv0lzPZkmt9-Cdq6zAPp5yP2bd9EW_nUaFhEbQgE92KT5QuWC0PXuK0DixjtYIc5-fVSRghIQUM7W4Wu1fIXQFdZAWbSMMccZztM2zTgcwyiLYYOr4FFzZ71Um2hwL-ulpKFwgM9fTYVCd69c0rtPhEFyt-gwAQm8PKllanZLU0xbIs6G3Bv5c28c"/>
-<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
-<div class="absolute bottom-8 left-8">
-<h3 class="text-2xl font-headline font-bold">RED V-Raptor 8K</h3>
-</div>
-</div>
-<div class="md:col-span-1 md:row-span-1 bg-surface-container-high rounded-3xl relative overflow-hidden group">
-<div class="absolute inset-0 flex items-center justify-center bg-tertiary/10 p-8">
-<div class="text-center">
-<p class="text-4xl font-headline font-bold text-tertiary">2.4k+</p>
-<p class="text-sm text-on-surface-variant mt-2">Active Tech Units</p>
-</div>
-</div>
-</div>
-<div class="md:col-span-1 md:row-span-1 bg-surface-container-high rounded-3xl relative overflow-hidden group">
-<div class="absolute inset-0 flex items-center justify-center bg-primary/10 p-8">
-<div class="text-center">
-<p class="text-4xl font-headline font-bold text-primary">99%</p>
-<p class="text-sm text-on-surface-variant mt-2">Trust Score</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- CTA Section -->
-<section class="py-32 px-6">
-<div class="max-w-5xl mx-auto relative">
-<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
-<div class="absolute -bottom-24 -left-24 w-96 h-96 bg-tertiary/10 rounded-full blur-[120px]"></div>
-<div class="relative bg-surface-container-highest border border-white/5 rounded-[3rem] p-12 md:p-24 overflow-hidden text-center">
-<h2 class="text-4xl md:text-6xl font-headline font-bold mb-8 max-w-3xl mx-auto leading-tight">
-                        Ready to transform your unused tech into cash?
-                    </h2>
-<p class="text-on-surface-variant text-xl mb-12 max-w-xl mx-auto">
-                        Join 15,000+ tech enthusiasts who are already powering the kinetic rental economy.
-                    </p>
-<button class="bg-gradient-to-br from-primary to-primary-dim text-on-primary px-12 py-5 rounded-2xl font-bold text-xl hover:shadow-[0_0_40px_rgba(129,236,255,0.4)] transition-all">
-                        Create an Account
-                    </button>
-</div>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="bg-slate-950 border-t border-slate-900 w-full pt-16 pb-8">
-<div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-<div class="space-y-6">
-<div class="text-lg font-black text-slate-100 uppercase tracking-widest">SmartBorrowLK</div>
-<p class="text-slate-500 max-w-md font-['Inter'] text-sm antialiased leading-relaxed">
-                    © 2024 SmartBorrowLK. Engineered for the Kinetic Ether. Providing world-class technology access through decentralized asset mobilization.
-                </p>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-3 gap-8">
-<div class="space-y-4">
-<p class="text-slate-100 font-bold text-sm">Platform</p>
-<ul class="space-y-2">
-<li><a class="text-slate-500 hover:text-cyan-300 transition-colors text-sm" href="#">Rent Tech</a></li>
-<li><a class="text-slate-500 hover:text-cyan-300 transition-colors text-sm" href="#">Lend Tech</a></li>
-<li><a class="text-slate-500 hover:text-cyan-300 transition-colors text-sm" href="#">Pricing</a></li>
-</ul>
-</div>
-<div class="space-y-4">
-<p class="text-slate-100 font-bold text-sm">Legal</p>
-<ul class="space-y-2">
-<li><a class="text-slate-500 hover:text-cyan-300 transition-colors text-sm" href="#">Privacy Policy</a></li>
-<li><a class="text-slate-500 hover:text-cyan-300 transition-colors text-sm" href="#">Terms of Service</a></li>
-</ul>
-</div>
-<div class="space-y-4">
-<p class="text-slate-100 font-bold text-sm">System</p>
-<ul class="space-y-2">
-<li><a class="text-slate-500 hover:text-cyan-300 transition-colors text-sm" href="#">Support</a></li>
-<li><a class="text-slate-500 hover:text-cyan-300 transition-colors text-sm" href="#">Network Status</a></li>
-</ul>
-</div>
-</div>
-</div>
-<div class="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-900 text-slate-600 text-xs text-center">
-            Designed for high-performance creative workflows. All rights reserved.
+            <h1 class="fw-bold mb-2" style="font-size: 2.5rem; letter-spacing: -0.02em;">Browse Tech Gear</h1>
+            <p style="color: var(--sb-text-muted); font-size: 1.05rem; margin-bottom: 0;">
+                Discover premium equipment available for rent in Sri Lanka.
+            </p>
         </div>
-</footer>
-</body></html>
+        @if (isLoggedIn)
+        {
+            <a asp-action="Create" class="btn btn-primary px-4 py-2 rounded-3 fw-bold">
+                <i class="bi bi-plus-circle me-2"></i>List Your Gear
+            </a>
+        }
+    </div>
+
+    <!-- Listings Grid -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var listing in Model)
+            {
+                <div class="col-sm-6 col-lg-4 col-xl-3 fade-in-up">
+                    <a asp-action="Details" asp-route-id="@listing.Id" class="text-decoration-none">
+                        <div class="listing-card">
+                            <div style="overflow: hidden;">
+                                @if (!string.IsNullOrEmpty(listing.ImageUrl))
+                                {
+                                    <img src="@listing.ImageUrl" alt="@listing.Item?.Name" class="listing-card-img" />
+                                }
+                                else if (!string.IsNullOrEmpty(listing.Item?.ImageUrl))
+                                {
+                                    <img src="@listing.Item.ImageUrl" alt="@listing.Item?.Name" class="listing-card-img" />
+                                }
+                                else
+                                {
+                                    <div class="listing-img-placeholder">
+                                        <i class="bi bi-camera"></i>
+                                    </div>
+                                }
+                            </div>
+                            <div class="listing-card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="listing-card-title mb-0" style="color: var(--sb-text);">@listing.Item?.Name</h6>
+                                </div>
+                                @if (!string.IsNullOrEmpty(listing.Item?.Condition))
+                                {
+                                    <span class="badge mb-2" style="background: rgba(129,236,255,0.1); color: var(--sb-primary); font-size: 0.68rem;">
+                                        @listing.Item.Condition
+                                    </span>
+                                }
+                                <div class="listing-card-price mt-auto">
+                                    Rs. @listing.PricePerDay.ToString("N0") <span>/ day</span>
+                                </div>
+                                <div class="listing-card-meta">
+                                    <i class="bi bi-person-circle"></i>
+                                    <span>@listing.Owner?.Name</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state fade-in-up">
+            <i class="bi bi-box-seam" style="font-size: 3.5rem;"></i>
+            <h4 class="fw-bold mt-3 mb-2">No listings available yet</h4>
+            <p style="color: var(--sb-text-muted);">Be the first to list your tech gear on SmartBorrowLK!</p>
+            @if (isLoggedIn)
+            {
+                <a asp-action="Create" class="btn btn-primary px-4 py-2 rounded-3 mt-2">
+                    <i class="bi bi-plus-circle me-2"></i>Create a Listing
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Auth" asp-action="Register" class="btn btn-primary px-4 py-2 rounded-3 mt-2">
+                    Get Started
+                </a>
+            }
+        </div>
+    }
+</div>

@@ -4,19 +4,20 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <a asp-controller="Listing" asp-action="Details" asp-route-id="@Model.ListingId" class="btn btn-sm btn-outline-secondary rounded-pill mb-4 px-3">
+            <a asp-controller="Listing" asp-action="Details" asp-route-id="@Model.ListingId"
+               class="btn btn-outline-secondary btn-sm rounded-pill px-3 mb-4">
                 <i class="bi bi-arrow-left me-1"></i> Back to Listing
             </a>
 
-            <h2 class="fw-bold mb-4" style="color: var(--sb-secondary);">Confirm Your Booking</h2>
+            <h2 class="fw-bold mb-4" style="font-size: 1.8rem;">Confirm Your Booking</h2>
 
-            <div class="sb-card border-0 shadow-sm overflow-hidden mb-4">
+            <div class="glass-panel overflow-hidden mb-4 fade-in-up">
                 <div class="row g-0">
-                    <div class="col-md-4 bg-light p-4 d-flex align-items-center justify-content-center border-end">
+                    <div class="col-md-4 p-4 d-flex align-items-center justify-content-center" style="background: var(--sb-surface); border-right: 1px solid var(--sb-outline);">
                         <div class="text-center">
-                            <i class="bi bi-calendar2-check display-1 text-primary mb-3"></i>
-                            <h5 class="fw-bold">@Model.ItemName</h5>
-                            <p class="text-muted mb-0">Rs. @Model.PricePerDay.ToString("N0") / day</p>
+                            <i class="bi bi-calendar2-check mb-3" style="font-size: 3rem; color: var(--sb-primary);"></i>
+                            <h5 class="fw-bold mb-1">@Model.ItemName</h5>
+                            <p class="mb-0" style="color: var(--sb-text-muted);">Rs. @Model.PricePerDay.ToString("N0") / day</p>
                         </div>
                     </div>
                     <div class="col-md-8 p-4 p-md-5">
@@ -25,36 +26,39 @@
                             <input type="hidden" asp-for="PricePerDay" />
                             <input type="hidden" asp-for="ItemName" />
 
-                            <div asp-validation-summary="ModelOnly" class="text-danger mb-4 bg-danger-subtle p-3 rounded"></div>
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
 
                             <div class="row mb-4">
                                 <div class="col-sm-6 mb-3 mb-sm-0">
-                                    <label asp-for="StartDate" class="form-label fw-semibold">Start Date</label>
-                                    <input asp-for="StartDate" type="date" class="form-control form-control-lg bg-light" id="startDate" required min="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
+                                    <label asp-for="StartDate" class="form-label">Start Date</label>
+                                    <input asp-for="StartDate" type="date" class="form-control" id="startDate"
+                                           required min="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
                                     <span asp-validation-for="StartDate" class="text-danger small mt-1"></span>
                                 </div>
                                 <div class="col-sm-6">
-                                    <label asp-for="EndDate" class="form-label fw-semibold">End Date</label>
-                                    <input asp-for="EndDate" type="date" class="form-control form-control-lg bg-light" id="endDate" required min="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
+                                    <label asp-for="EndDate" class="form-label">End Date</label>
+                                    <input asp-for="EndDate" type="date" class="form-control" id="endDate"
+                                           required min="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
                                     <span asp-validation-for="EndDate" class="text-danger small mt-1"></span>
                                 </div>
                             </div>
 
-                            <div class="bg-light p-3 rounded-3 mb-4 d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold text-muted">Estimated Total:</span>
-                                <span class="fw-bold fs-4 text-accent" id="totalCost">--</span>
+                            <div class="glass-panel p-3 mb-4 d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold" style="color: var(--sb-text-muted);">Estimated Total:</span>
+                                <span class="fw-bold text-price" style="font-size: 1.3rem;" id="totalCost">--</span>
                             </div>
 
-                            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm py-3 fw-semibold">
-                                Request Booking
+                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 rounded-3 fw-bold">
+                                <i class="bi bi-check-circle me-2"></i>Request Booking
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
-            
-            <p class="text-center text-muted small">
-                <i class="bi bi-shield-check text-success me-1"></i> Secure booking. You won't be charged until the owner approves.
+
+            <p class="text-center small" style="color: var(--sb-text-muted);">
+                <i class="bi bi-shield-check me-1" style="color: var(--sb-success);"></i>
+                Secure booking. You won't be charged until the owner approves.
             </p>
         </div>
     </div>
@@ -70,13 +74,11 @@
         function calculateTotal() {
             const start = new Date(startDateInput.value);
             const end = new Date(endDateInput.value);
-            
+
             if (start && end && end >= start) {
-                // Add 1 to include both start and end dates as rental days
                 const diffTime = Math.abs(end - start);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
                 const total = diffDays * pricePerDay;
-                
                 totalCostDisplay.innerHTML = `Rs. ${total.toLocaleString()}`;
             } else {
                 totalCostDisplay.innerHTML = '--';
@@ -84,14 +86,13 @@
         }
 
         startDateInput.addEventListener('change', function() {
-            // Ensure end date is not before start date
             endDateInput.min = this.value;
             if (new Date(endDateInput.value) < new Date(this.value)) {
                 endDateInput.value = this.value;
             }
             calculateTotal();
         });
-        
+
         endDateInput.addEventListener('change', calculateTotal);
     </script>
 }

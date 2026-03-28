@@ -1,319 +1,132 @@
 @model SmartBorrowLK.ViewModels.CreateListingViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "List Your Gear";
 }
-<!DOCTYPE html>
-<html class="dark" lang="en">
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>List Your Gear | SmartBorrowLK</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@600;700;800&display=swap"
-    rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-          rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-        darkMode: "class",
-        theme: {
-        extend: {
-        colors: {
-        "primary-fixed-dim": "#00d4ec",
-        "on-secondary-fixed-variant": "#3e47a0",
-        "on-tertiary": "#25006b",
-        "surface-dim": "#0a0e17",
-        "on-secondary-fixed": "#1f2882",
-        "tertiary-fixed-dim": "#ab93ff",
-        "primary-fixed": "#00e3fd",
-        "surface-container": "#151925",
-        "on-surface-variant": "#a7abb7",
-        "on-primary-fixed-variant": "#005762",
-        "inverse-primary": "#006976",
-        "surface-variant": "#202633",
-        "error-dim": "#d7383b",
-        "surface-container-lowest": "#000000",
-        "surface-container-highest": "#202633",
-        "secondary-dim": "#8d96f4",
-        "on-tertiary-fixed": "#1c0055",
-        "tertiary": "#a68cff",
-        "on-tertiary-container": "#ffffff",
-        "outline-variant": "#444852",
-        "secondary": "#929bfa",
-        "surface-bright": "#262c3a",
-        "on-background": "#ebedfb",
-        "on-primary-container": "#004d57",
-        "surface-tint": "#81ecff",
-        "outline": "#727581",
-        "secondary-fixed-dim": "#babfff",
-        "secondary-container": "#343d96",
-        "background": "#0a0e17",
-        "primary": "#81ecff",
-        "tertiary-container": "#7c4dff",
-        "inverse-on-surface": "#515560",
-        "on-secondary": "#0b1574",
-        "on-error": "#490006",
-        "inverse-surface": "#faf9ff",
-        "surface": "#0a0e17",
-        "primary-dim": "#00d4ec",
-        "on-tertiary-fixed-variant": "#4000ad",
-        "tertiary-dim": "#7e51ff",
-        "on-error-container": "#ffa8a3",
-        "on-primary": "#005762",
-        "on-surface": "#ebedfb",
-        "surface-container-low": "#0f131d",
-        "error-container": "#9f0519",
-        "secondary-fixed": "#cbceff",
-        "surface-container-high": "#1a1f2c",
-        "primary-container": "#00e3fd",
-        "error": "#ff716c",
-        "tertiary-fixed": "#b8a3ff",
-        "on-secondary-container": "#c9cdff",
-        "on-primary-fixed": "#003840"
-        },
-        fontFamily: {
-        "headline": ["Outfit"],
-        "body": ["Inter"],
-        "label": ["Space Grotesk"]
-        },
-        borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-        },
-        },
+<div class="container py-5">
+    <!-- Header -->
+    <div class="text-center mb-5 fade-in-up">
+        <div class="hero-tag mx-auto" style="margin-bottom: 1.5rem;">
+            <span class="material-symbols-outlined" style="font-size: 14px; font-variation-settings: 'FILL' 1;">auto_awesome</span>
+            AI-Powered Listing
+        </div>
+        <h1 class="fw-bold mb-3" style="font-size: 2.5rem; letter-spacing: -0.02em;">
+            Turn Your Gear Into
+            <span style="background: var(--sb-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Capital</span>
+        </h1>
+        <p style="color: var(--sb-text-muted); font-size: 1.05rem; max-width: 560px; margin: 0 auto;">
+            Upload a photo and let our AI handle the technical specs, pricing, and description for your rental listing.
+        </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <form asp-action="Create" method="post" enctype="multipart/form-data"
+                  class="glass-panel p-4 p-md-5 fade-in-up delay-1">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                <div class="row g-4">
+                    <!-- Left: Image Upload -->
+                    <div class="col-md-5">
+                        <div class="dropzone" onclick="document.getElementById('Image').click()">
+                            <input type="file" asp-for="Image" id="Image" class="d-none" accept="image/*"
+                                   onchange="previewImage(event)" />
+                            <img id="imagePreview" alt="Preview"
+                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWrsF17u98F-L0_-tjc0GUB7mbLuFz8PWcXgqDKht8fMEZC5nwsVLcnJ6wqFprI--Ba7by7bsezBqMLTFbXn_QfCbT6ZsGYrxz_JtCExNugff5KiWu3JRlJZSA4DgJHWvD2d_4PoxoE7ZDHFqnhOIuMjCO9vVVHtqoTD4VTmZJORBNcAO7v5YLplxckZwx8s036WCZi_4lMvWWo_Xn1mX8ujB4WYvR0C5kBZfUdt57d5-2y5rjIbuXBiJ2ZmlyRsiqYKv9bTMWUFs"
+                                 style="opacity: 0.35;" />
+                            <div id="uploadPrompt" class="position-relative text-center p-4" style="z-index: 2;">
+                                <div class="mb-3" style="width: 56px; height: 56px; border-radius: 50%; background: var(--sb-surface-high); display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <span class="material-symbols-outlined" style="color: var(--sb-primary); font-size: 1.6rem;">add_a_photo</span>
+                                </div>
+                                <span class="fw-bold d-block" style="font-size: 1rem;">Drop your gear image</span>
+                                <span class="small" style="color: var(--sb-text-muted);">AI will analyze brand and model</span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Image" class="text-danger small d-block mt-1"></span>
+
+                        <!-- Market Insights -->
+                        <div class="glass-panel p-3 mt-3">
+                            <h6 class="mb-3 d-flex align-items-center gap-2" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--sb-primary-dim);">
+                                <span class="material-symbols-outlined" style="font-size: 14px;">insights</span>
+                                Live Market Insights
+                            </h6>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <div>
+                                    <p class="mb-1 small" style="color: var(--sb-text-muted);">Average daily rate</p>
+                                    <p class="mb-0 fw-bold" style="font-size: 1.6rem;">.00</p>
+                                </div>
+                                <div class="text-end">
+                                    <p class="mb-1 small fw-bold" style="color: var(--sb-accent-light);">+12% Demand</p>
+                                    <div class="risk-bar-bg" style="width: 80px;">
+                                        <div class="risk-bar-fill" style="width: 75%; background: var(--sb-primary); box-shadow: 0 0 8px rgba(129,236,255,0.5);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Form Fields -->
+                    <div class="col-md-7">
+                        <div class="mb-3">
+                            <label asp-for="ItemName" class="form-label">Item Name</label>
+                            <input asp-for="ItemName" class="form-control" placeholder="e.g. Sony Alpha a7R IV" type="text" />
+                            <span asp-validation-for="ItemName" class="text-danger small d-block mt-1"></span>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label asp-for="Condition" class="form-label">Condition</label>
+                                <select asp-for="Condition" class="form-select">
+                                    <option value="Brand New">Brand New</option>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Well Used">Well Used</option>
+                                </select>
+                                <span asp-validation-for="Condition" class="text-danger small d-block mt-1"></span>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="ManualPrice" class="form-label">Price / Day (LKR)</label>
+                                <input asp-for="ManualPrice" class="form-control" placeholder="0.00" type="number" step="0.01" />
+                                <span asp-validation-for="ManualPrice" class="text-danger small d-block mt-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="RawDescription" class="form-label">Short Description</label>
+                            <textarea asp-for="RawDescription" class="form-control" placeholder="Describe the key features and inclusions..." rows="4" style="resize: none;"></textarea>
+                            <span asp-validation-for="RawDescription" class="text-danger small d-block mt-1"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" style="font-size: 1rem;">
+                            <span class="material-symbols-outlined" style="font-size: 1.2rem; font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+                            Generate Listing
+                        </button>
+                        <p class="text-center mt-3 small" style="color: var(--sb-text-dim); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;">
+                            Our neural network will optimize your post for 30% higher conversion
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImage(event) {
+            var input = event.target;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.opacity = '1';
+                    document.getElementById('uploadPrompt').style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
         }
     </script>
-    <style>
-        .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-
-        .glass-panel {
-        background: rgba(26, 31, 44, 0.4);
-        backdrop-filter: blur(20px);
-        border-top: 1px solid rgba(129, 236, 255, 0.1);
-        }
-
-        .kinetic-gradient {
-        background: linear-gradient(135deg, #81ecff 0%, #00d4ec 100%);
-        }
-    </style>
-</head>
-
-<body class="bg-background text-on-background font-body min-h-screen selection:bg-primary/30">
-    <!-- TopNavBar -->
-    <nav
-        class="fixed top-0 w-full z-50 bg-slate-950/40 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
-        <div class="flex justify-between items-center h-16 px-6 w-full max-w-none">
-            <div class="flex items-center gap-8">
-                <a href="/"
-                   class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600 font-['Space_Grotesk']">SmartBorrowLK</a>
-                <div class="hidden md:flex gap-6 items-center">
-                    <a class="text-slate-400 hover:text-slate-200 transition-colors font-['Space_Grotesk'] tracking-tight"
-                       href="/Listing">Browse</a>
-                    <a class="text-cyan-400 font-bold border-b-2 border-cyan-400 pb-1 font-['Space_Grotesk'] tracking-tight"
-                       href="/Listing/Create">List Gear</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content Canvas -->
-    <main class="relative pt-32 pb-24 px-6 overflow-hidden">
-        <!-- Background Elements -->
-        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full -z-10">
-        </div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary/10 blur-[100px] rounded-full -z-10">
-        </div>
-        <div class="max-w-4xl mx-auto">
-            <!-- Header Section -->
-            <div class="text-center mb-12">
-                <div
-                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-label font-bold tracking-widest uppercase mb-6">
-                    <span class="material-symbols-outlined text-[14px]" data-icon="auto_awesome"
-                          style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-                    AI-Powered Listing
-                </div>
-                <h1
-                    class="text-5xl md:text-6xl font-headline font-extrabold text-on-background tracking-tight mb-4 leading-tight">
-                    Turn Your Gear Into <br />
-                    <span class="text-transparent bg-clip-text kinetic-gradient">Kinetic Capital</span>
-                </h1>
-                <p class="text-on-surface-variant text-lg max-w-xl mx-auto font-body">
-                    Upload a photo and let our AI handle the technical specs, pricing, and description for a
-                    high-performance rental listing.
-                </p>
-            </div>
-
-            <!-- Main Form Card -->
-            <form asp-action="Create" method="post" enctype="multipart/form-data"
-                  class="glass-panel rounded-[2rem] p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 relative overflow-hidden">
-                <div asp-validation-summary="ModelOnly" class="text-error mb-4"></div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <!-- Left Column: Visual Assets -->
-                    <div class="space-y-6">
-                        <div class="group relative aspect-square rounded-2xl bg-surface-container-lowest border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-all duration-500 overflow-hidden"
-                             onclick="document.getElementById('Image').click()">
-                            <input type="file" asp-for="Image" id="Image" class="hidden" accept="image/*"
-                                   onchange="previewImage(event)" />
-                            <div
-                                class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                            </div>
-                            <img id="imagePreview" alt="Camera Gear Placeholder"
-                                 class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700"
-                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWrsF17u98F-L0_-tjc0GUB7mbLuFz8PWcXgqDKht8fMEZC5nwsVLcnJ6wqFprI--Ba7by7bsezBqMLTFbXn_QfCbT6ZsGYrxz_JtCExNugff5KiWu3JRlJZSA4DgJHWvD2d_4PoxoE7ZDHFqnhOIuMjCO9vVVHtqoTD4VTmZJORBNcAO7v5YLplxckZwx8s036WCZi_4lMvWWo_Xn1mX8ujB4WYvR0C5kBZfUdt57d5-2y5rjIbuXBiJ2ZmlyRsiqYKv9bTMWUFs" />
-                            <div id="uploadPrompt" class="relative z-10 flex flex-col items-center p-6 text-center">
-                                <div
-                                    class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-4 shadow-xl">
-                                    <span class="material-symbols-outlined text-primary text-3xl"
-                                          data-icon="add_a_photo">add_a_photo</span>
-                                </div>
-                                <span class="text-on-surface font-headline text-lg font-bold">Drop your gear
-                                    image</span>
-                                    <span class="text-on-surface-variant text-sm mt-1">AI will analyze brand and
-                                        model</span>
-                                    </div>
-                                </div>
-                                <span asp-validation-for="Image" class="text-error text-sm block mt-1"></span>
-
-                                <div class="p-6 rounded-xl bg-surface-container-low border border-outline-variant/20">
-                                    <h3
-                                        class="font-label text-xs uppercase tracking-[0.2em] text-primary-fixed-dim mb-4 flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-sm" data-icon="insights">insights</span>
-                                        Live Market Insights
-                                    </h3>
-                                    <div class="flex justify-between items-end">
-                                        <div>
-                                            <p class="text-on-surface-variant text-xs mb-1">Average daily rate</p>
-                                            <p class="text-3xl font-headline font-bold text-on-surface">.00</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <p class="text-tertiary font-label text-xs font-bold uppercase tracking-wider">+12%
-                                                Demand</p>
-                                                <div
-                                                    class="h-1.5 w-24 bg-surface-container-highest rounded-full mt-2 overflow-hidden">
-                                                    <div class="h-full bg-primary w-3/4 shadow-[0_0_8px_rgba(129,236,255,0.6)]">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Right Column: Details -->
-                                <div class="flex flex-col gap-6">
-                                    <div class="group">
-                                        <label asp-for="ItemName"
-                                               class="block text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Item
-                                            Name</label>
-                                            <input asp-for="ItemName"
-                                                   class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-body"
-                                                   placeholder="e.g. Sony Alpha a7R IV" type="text" />
-                                            <span asp-validation-for="ItemName" class="text-error text-sm block mt-1"></span>
-                                        </div>
-
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div class="group">
-                                                <label asp-for="Condition"
-                                                       class="block text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Condition</label>
-                                                <div class="relative">
-                                                    <select asp-for="Condition"
-                                                            class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-body appearance-none cursor-pointer">
-                                                        <option value="Brand New">Brand New</option>
-                                                        <option value="Excellent">Excellent</option>
-                                                        <option value="Good">Good</option>
-                                                        <option value="Well Used">Well Used</option>
-                                                    </select>
-                                                    <span
-                                                    class="material-symbols-outlined absolute right-3 top-3.5 text-on-surface-variant pointer-events-none"
-                                                    data-icon="expand_more">expand_more</span>
-                                                </div>
-                                                <span asp-validation-for="Condition" class="text-error text-sm block mt-1"></span>
-                                            </div>
-
-                                            <div class="group">
-                                                <label asp-for="ManualPrice"
-                                                       class="block text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Price
-                                                    / Day (LKR)</label>
-                                                    <div class="relative">
-                                                        <span class="absolute left-4 top-3.5 text-primary-fixed-dim font-bold">$</span>
-                                                        <input asp-for="ManualPrice"
-                                                               class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg pl-8 pr-4 py-3 text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-body"
-                                                               placeholder="0.00" type="number" step="0.01" />
-                                                    </div>
-                                                    <span asp-validation-for="ManualPrice" class="text-error text-sm block mt-1"></span>
-                                                </div>
-                                            </div>
-
-                                            <div class="group relative">
-                                                <div class="flex justify-between items-center mb-2">
-                                                    <label asp-for="RawDescription"
-                                                           class="text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant group-focus-within:text-primary transition-colors">Short
-                                                        Description</label>
-                                                    </div>
-                                                    <textarea asp-for="RawDescription"
-                                                              class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-body resize-none"
-                                                              placeholder="Describe the key features and inclusions..." rows="4"></textarea>
-                                                    <span asp-validation-for="RawDescription" class="text-error text-sm block mt-1"></span>
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <button type="submit"
-                                                            class="w-full kinetic-gradient text-on-primary-fixed font-headline font-extrabold text-lg py-4 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,212,236,0.4)] hover:shadow-[0_15px_35px_-5px_rgba(0,212,236,0.5)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-                                                        <span class="material-symbols-outlined" data-icon="auto_fix_high"
-                                                              style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
-                                                        Generate Listing
-                                                    </button>
-                                                    <p class="text-center text-[10px] font-label text-outline uppercase tracking-widest mt-4">
-                                                        Our neural network will optimize your post for 30% higher conversion
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </main>
-
-                            <!-- Footer -->
-                                                        <footer class="bg-slate-950 w-full py-12 border-t border-white/5 mt-auto">
-                                <div class="flex flex-col md:flex-row justify-between items-center px-8 gap-6 w-full">
-                                    <div class="flex flex-col items-center md:items-start">
-                                        <span class="text-lg font-bold text-slate-200 font-['Space_Grotesk'] tracking-tighter mb-2">SmartBorrowLK</span>
-                                        <p class="font-['Inter'] text-[10px] uppercase tracking-widest text-slate-500">&copy; @DateTime.Now.Year SmartBorrowLK. All Rights Reserved.</p>
-                                    </div>
-                                    <div class="flex flex-wrap justify-center gap-6">
-                                        <a class="font-['Inter'] text-xs uppercase tracking-widest text-slate-500 hover:text-cyan-300 transition-colors" href="#">Terms of Service</a>
-                                        <a class="font-['Inter'] text-xs uppercase tracking-widest text-slate-500 hover:text-cyan-300 transition-colors" href="#">Privacy Policy</a>
-                                        <a class="font-['Inter'] text-xs uppercase tracking-widest text-slate-500 hover:text-cyan-300 transition-colors" href="#">Rental Agreement</a>
-                                    </div>
-                                </div>
-                            </footer>
-
-                                <script>
-                                    function previewImage(event) {
-                                    var input = event.target;
-                                    if (input.files && input.files[0]) {
-                                    var reader = new FileReader();
-                                    reader.onload = function (e) {
-                                    var preview = document.getElementById('imagePreview');
-                                    preview.src = e.target.result;
-                                    preview.classList.remove('opacity-40');
-                                    preview.classList.add('opacity-100');
-                                    document.getElementById('uploadPrompt').style.display = 'none';
-                                    }
-                                    reader.readAsDataURL(input.files[0]);
-                                    }
-                                    }
-                                </script>
-
-                                @section Scripts {
-                                    <partial name="_ValidationScriptsPartial" />
-                                }
-                            </body>
-
-                        </html>
-
-
-
-
+}
