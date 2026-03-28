@@ -10,6 +10,8 @@ namespace SmartBorrowLK.Services
         Task<bool> IsItemAvailableAsync(int listingId, DateTime startDate, DateTime endDate);
         Task<Booking?> CreateBookingAsync(int userId, CreateBookingViewModel model);
         Task<List<Booking>> GetUserBookingsAsync(int userId);
+        Task<List<Booking>> GetVendorBookingsAsync(int vendorId);
+        Task<bool> UpdateBookingStatusAsync(int bookingId, int vendorId, string status);
     }
 
     public class BookingService : IBookingService
@@ -23,11 +25,16 @@ namespace SmartBorrowLK.Services
 
         public async Task<bool> IsItemAvailableAsync(int listingId, DateTime startDate, DateTime endDate)
         {
+            // Ensure dates are UTC for Postgres
+            var utcStartDate = startDate.Kind == DateTimeKind.Utc ? startDate : startDate.ToUniversalTime();
+            var utcEndDate = endDate.Kind == DateTimeKind.Utc ? endDate : endDate.ToUniversalTime();
+
             // Check if there are any existing bookings for this listing that overlap with the requested dates
-            bool hasOverlap = await _context.Bookings.AnyAsync(b => 
+            bool hasOverlap = await _context.Bookings.AnyAsync(b =>
                 b.ListingId == listingId &&
-                b.StartDate < endDate && 
-                b.EndDate > startDate);
+                b.Status != "Rejected" &&
+                b.StartDate < utcEndDate &&
+                b.EndDate > utcStartDate);
 
             return !hasOverlap;
         }
@@ -58,6 +65,30 @@ namespace SmartBorrowLK.Services
                 .Where(b => b.UserId == userId)
                 .OrderByDescending(b => b.StartDate)
                 .ToListAsync();
+        }
+
+        public async Task<List<Booking>> GetVendorBookingsAsync(int vendorId)
+        {
+            return await _context.Bookings
+                .Include(b => b.Listing)
+                .ThenInclude(l => l.Item)
+                .Include(b => b.User)
+                .Where(b => b.Listing.OwnerId == vendorId)
+                .OrderByDescending(b => b.StartDate)
+                .ToListAsync();
+        }
+
+        public async Task<bool> UpdateBookingStatusAsync(int bookingId, int vendorId, string status)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Listing)
+                .FirstOrDefaultAsync(b => b.Id == bookingId && b.Listing.OwnerId == vendorId);
+
+            if (booking == null) return false;
+
+            booking.Status = status;
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

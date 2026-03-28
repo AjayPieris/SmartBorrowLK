@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartBorrowLK.Services;
 using SmartBorrowLK.ViewModels;
+using System.Security.Claims;
 
 namespace SmartBorrowLK.Controllers
 {
@@ -14,7 +15,7 @@ namespace SmartBorrowLK.Controllers
         }
 
         // Helper to check if user is logged in
-        private int? GetCurrentUserId() => HttpContext.Session.GetInt32("UserId");
+        private int? GetCurrentUserId() => User.Identity?.IsAuthenticated == true ? int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0") : null;
 
         public async Task<IActionResult> Index()
         {
@@ -45,7 +46,7 @@ namespace SmartBorrowLK.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var listing = await _listingService.CreateListingAsync(userId.Value, model);
-            
+
             if (listing == null)
             {
                 ModelState.AddModelError("", "Failed to generate listing. Please try again.");

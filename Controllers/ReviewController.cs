@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartBorrowLK.Services;
 using SmartBorrowLK.ViewModels;
+using System.Security.Claims;
 
 namespace SmartBorrowLK.Controllers
 {
@@ -15,7 +16,7 @@ namespace SmartBorrowLK.Controllers
             _listingService = listingService;
         }
 
-        private int? GetCurrentUserId() => HttpContext.Session.GetInt32("UserId");
+        private int? GetCurrentUserId() => User.Identity?.IsAuthenticated == true ? int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0") : null;
 
         [HttpGet]
         public async Task<IActionResult> Create(int listingId)
@@ -43,7 +44,7 @@ namespace SmartBorrowLK.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var review = await _reviewService.AddReviewAsync(userId.Value, model);
-            
+
             if (review == null)
             {
                 ModelState.AddModelError("", "Failed to process review. Please try again.");

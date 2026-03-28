@@ -8,7 +8,7 @@
     <title>@ViewData["Title"] - SmartBorrow LK</title>
     <meta name="description" content="Rent Smart. Earn Easy. AI-powered tech rental platform in Sri Lanka." />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -112,6 +112,11 @@
                                         <li>
                                             <a class="dropdown-item" asp-controller="Listing" asp-action="MyListings">
                                                 <i class="bi bi-collection"></i> My Listings
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Booking" asp-action="Requests">
+                                                <i class="bi bi-inboxes"></i> Booking Requests
                                             </a>
                                         </li>
                                     }

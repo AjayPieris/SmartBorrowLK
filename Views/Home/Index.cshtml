@@ -1,108 +1,229 @@
 @{
-    ViewData["Title"] = "Home Page";
+    Layout = null;
+    var userName = User.Identity?.Name;
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
+    var userEmail = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value ??
+    (userName != null ? $"{userName.Replace(" ", "").ToLower()}@example.com" : "");
+    var userProfileImage = User.Claims.FirstOrDefault(c => c.Type == "ProfileImage")?.Value;
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var isAdmin = userRole?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+    var isVendor = userRole?.Equals("Vendor", StringComparison.OrdinalIgnoreCase) == true;
+    
+    string GetInitials(string? name)
+    {
+        if (string.IsNullOrEmpty(name)) return "U";
+        var parts = name.Split(' ');
+        if (parts.Length == 1) return parts[0].Substring(0, 1).ToUpper();
+        return (parts[0].Substring(0, 1) + parts[1].Substring(0, 1)).ToUpper();
+    }
 }
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SmartBorrowLK | Rent Smart. Earn Easy.</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed-variant": "#005762",
+              "tertiary-fixed": "#b8a3ff",
+              "primary": "#81ecff",
+              "secondary": "#929bfa",
+              "secondary-fixed-dim": "#babfff",
+              "primary-fixed-dim": "#00d4ec",
+              "on-surface-variant": "#a7abb7",
+              "tertiary-container": "#7c4dff",
+              "background": "#0a0e17",
+              "surface-container": "#151925",
+              "surface-bright": "#262c3a",
+              "surface-dim": "#0a0e17",
+              "inverse-primary": "#006976",
+              "surface-container-high": "#1a1f2c",
+              "surface-container-highest": "#202633",
+              "error": "#ff716c",
+              "error-container": "#9f0519",
+              "on-error-container": "#ffa8a3"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk", "sans-serif"],
+              "body": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        body { background-color: #0a0e17; color: #ebedfb; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .glass-panel { background: rgba(32, 38, 51, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .hero-gradient { background: radial-gradient(circle at 50% 50%, rgba(129, 236, 255, 0.08) 0%, rgba(10, 14, 23, 0) 70%); }
+    </style>
+</head>
+<body class="dark bg-background text-on-background selection:bg-primary/30">
+<nav class="fixed top-0 w-full z-50 bg-slate-950/40 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]">
+    <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+        <div class="text-2xl font-bold bg-gradient-to-br from-cyan-400 to-cyan-600 bg-clip-text text-transparent font-headline tracking-tight">
+            SmartBorrowLK
+        </div>
+        <div class="hidden md:flex items-center space-x-8 font-headline tracking-tight">
+            <a class="text-cyan-400 font-bold border-b-2 border-cyan-400 pb-1" asp-controller="Listing" asp-action="Index">Explore</a>
+            <a class="text-slate-400 hover:text-slate-100 transition-colors hover:bg-white/5 px-3 py-1 rounded-lg" href="#how-it-works">How it Works</a>
+        </div>
+        <div class="flex items-center gap-4">
+            @if (isLoggedIn)
+            {
+                <div class="relative group">
+                    <button class="flex items-center gap-2 bg-white/5 hover:bg-white/10 p-1 pr-3 rounded-full transition-all border border-white/10">
+                        <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/30">
+                            @if (!string.IsNullOrEmpty(userProfileImage))
+                            {
+                                <img src="@userProfileImage" alt="@userName" class="w-full h-full object-cover" />
+                            }
+                            else
+                            {
+                                <span>@GetInitials(userName)</span>
+                            }
+                        </div>
+                        <span class="text-sm font-medium text-slate-200">@userName</span>
+                    </button>
+                    <div class="absolute right-0 top-full mt-2 w-56 rounded-xl bg-surface-container-high border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
+                        <div class="p-4 border-b border-white/10">
+                            <p class="text-sm font-bold text-white truncate">@userName</p>
+                            <p class="text-xs text-slate-400 truncate mt-1">@userEmail</p>
+                        </div>
+                        <div class="p-2 space-y-1">
+                            @if (isAdmin)
+                            {
+                                <a asp-controller="Admin" asp-action="Dashboard" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Admin Dashboard</a>
+                            }
+                            @if (isVendor)
+                            {
+                                <a asp-controller="Listing" asp-action="MyListings" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">My Listings</a>
+                                <a asp-controller="Booking" asp-action="Requests" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Booking Requests</a>
+                            }
+                            <a asp-controller="Booking" asp-action="MyBookings" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">My Bookings</a>
+                        </div>
+                        <div class="p-2 border-t border-white/10">
+                            <a asp-controller="Auth" asp-action="Logout" class="block px-3 py-2 text-sm text-error hover:text-error-dim hover:bg-error/10 rounded-lg transition-colors">Logout</a>
+                        </div>
+                    </div>
+                    <!-- invisible hit box for smooth dropdown interaction -->
+                    <div class="absolute right-0 top-full w-full h-4"></div>
+                </div>
+            }
+            else
+            {
+                <a asp-controller="Auth" asp-action="Login" class="text-slate-300 hover:text-white flex items-center font-bold px-4 transition-colors">Login</a>
+                <a asp-controller="Auth" asp-action="Register" class="bg-gradient-to-br from-primary to-primary-fixed-dim text-on-primary-fixed-variant font-bold px-6 py-2 rounded-xl hover:scale-105 transition-transform">Get Started</a>
+            }
+        </div>
+    </div>
+</nav>
 
-<!-- Hero Section -->
-<section class="sb-hero text-center position-relative overflow-hidden">
-    <div class="container position-relative" style="z-index: 2;">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10 py-5">
-                <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-semibold">
-                    <i class="bi bi-stars"></i> Sri Lanka's #1 Tech Rental Marketplace
-                </span>
-                <h1 class="hero-title">Rent Smart. Earn Easy.</h1>
-                <p class="hero-subtitle">
-                    AI-powered tech rental platform in Sri Lanka. Borrow top-tier cameras, laptops, drones,
-                    and gear instantly. Or list your idle tech to earn passive income.
+<main class="relative pt-24">
+    <!-- Hero Section -->
+    <section class="relative min-h-[921px] flex items-center overflow-hidden px-6">
+        <div class="hero-gradient absolute inset-0 z-0"></div>
+        <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+            <div class="space-y-8">
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-high border border-primary/20 text-primary text-xs font-medium tracking-widest uppercase mb-4">
+                    <span class="mr-2">●</span> The Future of Access
+                </div>
+                <h1 class="text-6xl md:text-8xl font-headline font-bold leading-none tracking-tighter">
+                    Rent <span class="text-primary italic">Smart.</span><br/>
+                    Earn <span class="text-tertiary-container">Easy.</span>
+                </h1>
+                <p class="text-on-surface-variant text-xl md:text-2xl font-light leading-relaxed max-w-xl">
+                    Experience the first AI-powered tech rental ecosystem. Securely borrow elite hardware or monetize your idle gear.
                 </p>
-                
-                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
-                    <a asp-controller="Listing" asp-action="Index"
-                           class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">
-                        <i class="bi bi-search me-2"></i> Browse Items
+                <div class="flex flex-wrap gap-4 pt-4">
+                    <a asp-controller="Listing" asp-action="Index" class="inline-block bg-gradient-to-br from-primary to-primary-fixed-dim text-on-primary-fixed-variant px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-transform shadow-lg shadow-primary/20">
+                        Browse Items
                     </a>
-                    @if (User.Claims.FirstOrDefault(c => c.Type ==
-                                        System.Security.Claims.ClaimTypes.Role)?.Value?.Equals("Vendor", StringComparison.OrdinalIgnoreCase)
-                                        == true)
+                    @if (isLoggedIn && isVendor)
                     {
-                        <a asp-controller="Listing" asp-action="Create"
-                               class="btn btn-outline-primary btn-lg rounded-pill px-5">
-                            <i class="bi bi-plus-circle me-2"></i> List Your Item
+                        <a asp-controller="Listing" asp-action="Create" class="inline-block bg-surface-container-highest text-primary px-8 py-4 rounded-xl font-bold text-lg hover:bg-surface-bright transition-colors">
+                            List Your Item
                         </a>
                     }
-                    else if (User.Identity?.IsAuthenticated != true)
+                    else if (!isLoggedIn)
                     {
-                        <a asp-controller="Auth" asp-action="Register"
-                               class="btn btn-outline-primary btn-lg rounded-pill px-5">
-                            <i class="bi bi-person-plus me-2"></i> Become a Vendor
+                        <a asp-controller="Auth" asp-action="Register" class="inline-block bg-surface-container-highest text-primary px-8 py-4 rounded-xl font-bold text-lg hover:bg-surface-bright transition-colors">
+                            Become a Vendor
                         </a>
                     }
                 </div>
             </div>
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-primary/30 to-tertiary-container/30 rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition duration-1000"></div>
+                <div class="relative bg-surface-container-high rounded-3xl overflow-hidden aspect-square border border-white/5">
+                    <img alt="Futuristic Drone" class="w-full h-full object-cover mix-blend-lighten opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUqeSAF2DV2lbL6_RUAy9dYdRgYLKmm2MbtilfbJW8mYuEQpedsa2L44riRXqSyDBZd_onF-YhioQUjzx2QDQ9qwCRjhFXsorr3t_z3fLpTRvqpYcf8c-2LVhS86Imj9W0zOCgrWy14xYF9jRiC5Jbwz6Q1lmnEbnDPtsfBHn6LHt2tj5kU0_MwAt35lFolLUdpr9aGbjE2u5TvhLjmtKNLEdXNvP2I6uAZ0QSGrhFdjY3CNtybVt58ScEmQYB41lwXoJO5nqwOKM"/>
+                    <div class="absolute bottom-6 left-6 right-6 glass-panel p-6 rounded-2xl border border-white/10">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-on-surface-variant text-sm font-medium mb-1 tracking-wider uppercase">Active Listing</p>
+                                <h3 class="text-xl font-bold font-headline">DJI Mavic 3 Pro</h3>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-primary font-bold text-lg">$45<span class="text-xs text-on-surface-variant font-normal">/day</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </section>
+
+    <!-- Bento Grid Tech Showcase -->
+    <section id="how-it-works" class="py-32 px-6 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-full md:h-[600px]">
+            <div class="md:col-span-2 md:row-span-2 bg-surface-container-high rounded-3xl relative overflow-hidden group">
+                <img alt="Premium Laptop" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-gu-HcMc87A_Jp0q22Vc8LkVqUunfD1jx3rh__t8I_-z8Q23Lc0NOb89NBQdUGhMYljiIC0GNOB1caOzeWXABZBvurWa8VPf1ebZj13O5LgnTsz2N0oBdN-v5uZsclCGrVdvTpB_jGTuu0I8q0SpTKZwiZa3pLNtF4rYclfhfdofM7b6JKeaH6I9XrUOnrQPtMhTtD_unHLd0i2z3dpIuWO56CFX3tio6eilYc3ENWyd9wmLVrUMVUezpoz40btyngWmeHmHXwBY"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+                <div class="absolute bottom-8 left-8">
+                    <span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold mb-4 inline-block">MOST WANTED</span>
+                    <h3 class="text-3xl font-headline font-bold">MacBook Pro M3 Max</h3>
+                </div>
+            </div>
+            <div class="md:col-span-2 md:row-span-1 bg-surface-container-high rounded-3xl relative overflow-hidden group">
+                <img alt="Cinema Gear" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkZLm48b2zIOHIIgWaP6ayES1ELk8q82U5-5gvYmSec2IHej4aNU9Bpm_hHypDFjm_ejSprsKzeEHteaKVN2jv0lzPZkmt9-Cdq6zAPp5yP2bd9EW_nUaFhEbQgE92KT5QuWC0PXuK0DixjtYIc5-fVSRghIQUM7W4Wu1fIXQFdZAWbSMMccZztM2zTgcwyiLYYOr4FFzZ71Um2hwL-ulpKFwgM9fTYVCd69c0rtPhEFyt-gwAQm8PKllanZLU0xbIs6G3Bv5c28c"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+                <div class="absolute bottom-8 left-8">
+                    <h3 class="text-2xl font-headline font-bold">RED V-Raptor 8K</h3>
+                </div>
+            </div>
+            <div class="md:col-span-1 md:row-span-1 bg-surface-container-high rounded-3xl relative overflow-hidden group">
+                <div class="absolute inset-0 flex items-center justify-center bg-tertiary-container/10 p-8">
+                    <div class="text-center">
+                        <p class="text-4xl font-headline font-bold text-tertiary-container">2.4k+</p>
+                        <p class="text-sm text-on-surface-variant mt-2">Active Tech Units</p>
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-1 md:row-span-1 bg-surface-container-high rounded-3xl relative overflow-hidden group">
+                <div class="absolute inset-0 flex items-center justify-center bg-primary/10 p-8">
+                    <div class="text-center">
+                        <p class="text-4xl font-headline font-bold text-primary">99%</p>
+                        <p class="text-sm text-on-surface-variant mt-2">Trust Score</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 border-t border-slate-900 w-full pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+        <p class="text-slate-500 font-body text-sm antialiased">
+            &copy; 2026 SmartBorrowLK. All rights reserved.
+        </p>
     </div>
-</section>
-
-<!-- Featured Categories / Features (Alternative since Featured Listings require backend logic) -->
-<section class="py-5" style="background-color: var(--sb-bg);">
-    <div class="container py-4">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold mb-2">How It Works</h2>
-            <p class="text-muted">A seamless experience powered by Artificial Intelligence</p>
-        </div>
-
-        <div class="row g-4 text-center">
-            <div class="col-md-4">
-                <div class="sb-card p-5 h-100 border-0">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-4"
-                         style="width: 80px; height: 80px; font-size: 2rem;">
-                        <i class="bi bi-magic"></i>
-                    </div>
-                    <h4 class="fw-semibold">AI Auto-Listings</h4>
-                    <p class="text-muted">Vendors just type a single sentence. Our AI instantly generates professional
-                        descriptions and rental prices.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="sb-card p-5 h-100 border-0">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-4"
-                             style="width: 80px; height: 80px; font-size: 2rem;">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <h4 class="fw-semibold">Smart Risk Scoring</h4>
-                        <p class="text-muted">Every item goes through AI risk evaluation. High-value, high-risk items are
-                            securely reviewed before going live.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="sb-card p-5 h-100 border-0">
-                            <div class="d-inline-flex align-items-center justify-content-center bg-warning-subtle text-warning rounded-circle mb-4"
-                                 style="width: 80px; height: 80px; font-size: 2rem;">
-                                <i class="bi bi-calendar-event"></i>
-                            </div>
-                            <h4 class="fw-semibold">Easy Booking</h4>
-                            <p class="text-muted">Find exactly what you need, book it for specific dates seamlessly, and leave a
-                                review once returned.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Call to Action -->
-            <section class="py-5 bg-white border-top border-bottom border-light">
-                <div class="container py-4 text-center">
-                    <h2 class="fw-bold mb-3">Ready to transform your unused tech into cash?</h2>
-                    <p class="text-muted mb-4">Join hundreds of vendors earning daily on SmartBorrow LK.</p>
-                    @if (User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value?.Equals("Vendor", StringComparison.OrdinalIgnoreCase) == true)
-                    {
-                        <a asp-controller="Listing" asp-action="Create" class="btn btn-accent btn-lg px-5 rounded-pill shadow-sm">Start
-                            Earning Today</a>
-                        }
-        else
-                        {
-                            <a asp-controller="Auth" asp-action="Register" class="btn btn-accent btn-lg px-5 rounded-pill shadow-sm">Create
-                                an Account</a>
-                            }
-                        </div>
-                    </section>
+</footer>
+</body>
+</html>

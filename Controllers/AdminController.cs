@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartBorrowLK.Services;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace SmartBorrowLK.Controllers
 {
@@ -16,7 +17,7 @@ namespace SmartBorrowLK.Controllers
         // Simple custom security check
         private bool IsAdmin()
         {
-            var role = HttpContext.Session.GetString("UserRole");
+            var role = User.FindFirstValue(ClaimTypes.Role);
             return string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase);
         }
 

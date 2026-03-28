@@ -1,81 +1,247 @@
-@model SmartBorrowLK.ViewModels.CreateListingViewModel
-@{ ViewData["Title"] = "Create Listing"; }
+<!DOCTYPE html>
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-7 col-md-9">
-            <div class="mb-4 text-center">
-                <span class="badge bg-primary-subtle px-3 py-2 rounded-pill mb-3">
-                    <i class="bi bi-robot"></i> AI-Powered Listing
-                </span>
-                <h2 class="fw-bold" style="color: var(--sb-secondary);">List Your Gear</h2>
-                <p class="text-muted">Our AI handles the heavy lifting – we generate a professional description, rental terms, and suggested pricing instantly.</p>
-            </div>
-
-            <div class="sb-card border-0 shadow-sm overflow-hidden">
-                <div class="bg-primary p-4 text-white text-center">
-                    <h5 class="mb-0 fw-semibold"><i class="bi bi-box-seam me-2"></i> Item Details</h5>
-                </div>
-                <div class="card-body p-4 p-md-5">
-                    <form asp-action="Create" method="post" enctype="multipart/form-data" id="createForm">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4 small fw-medium bg-danger-subtle p-3 rounded"></div>
-
-                        <div class="mb-4">
-                            <label asp-for="ItemName" class="form-label fw-semibold">Item Name</label>
-                            <input asp-for="ItemName" class="form-control form-control-lg bg-light" placeholder="e.g., DJI Mini 3 Pro Drone" />
-                            <span asp-validation-for="ItemName" class="text-danger small mt-1 d-block"></span>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-sm-6 mb-4 mb-sm-0">
-                                <label asp-for="Condition" class="form-label fw-semibold">Condition</label>
-                                <select asp-for="Condition" class="form-select form-select-lg bg-light">
-                                    <option value="Brand New">Brand New</option>
-                                    <option value="Like New">Like New</option>
-                                    <option value="Good">Good</option>
-                                    <option value="Fair">Fair</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-6">
-                                <label asp-for="Image" class="form-label fw-semibold">Upload Photo</label>
-                                <input asp-for="Image" type="file" class="form-control form-control-lg bg-light" accept="image/*" />
-                                <span asp-validation-for="Image" class="text-danger small mt-1 d-block"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="RawDescription" class="form-label fw-semibold">Short Description</label>
-                            <textarea asp-for="RawDescription" class="form-control bg-light" rows="3"
-                                      placeholder="e.g., Sony A7III purchased last year, comes with 2 batteries and a hard case."></textarea>
-                            <span asp-validation-for="RawDescription" class="text-danger small mt-1 d-block"></span>
-                            <div class="form-text mt-2"><i class="bi bi-magic text-primary"></i> Write a simple sentence. AI will expand this into a rich, SEO-friendly description.</div>
-                        </div>
-
-                        <div class="mb-5">
-                            <label asp-for="ManualPrice" class="form-label fw-semibold">Your Price Per Day (Optional)</label>
-                            <div class="input-group input-group-lg">
-                                <span class="input-group-text border-end-0 bg-light">Rs.</span>
-                                <input asp-for="ManualPrice" class="form-control bg-light border-start-0 ps-0" type="number" step="50" min="0" placeholder="e.g., 2500" />
-                            </div>
-                            <span asp-validation-for="ManualPrice" class="text-danger small mt-1 d-block"></span>
-                            <div class="form-text mt-2"><i class="bi bi-info-circle"></i> Leave blank and AI will suggest an optimal rental price based on the item.</div>
-                        </div>
-
-                        <button class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm py-3" type="submit" id="submitBtn">
-                            <i class="bi bi-stars me-2"></i> <span id="btnText" class="fw-semibold">Generate with AI</span>
-                            <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>List Your Gear | TECHRENTAL</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;family=Outfit:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-fixed-dim": "#00d4ec",
+                        "on-secondary-fixed-variant": "#3e47a0",
+                        "on-tertiary": "#25006b",
+                        "surface-dim": "#0a0e17",
+                        "on-secondary-fixed": "#1f2882",
+                        "tertiary-fixed-dim": "#ab93ff",
+                        "primary-fixed": "#00e3fd",
+                        "surface-container": "#151925",
+                        "on-surface-variant": "#a7abb7",
+                        "on-primary-fixed-variant": "#005762",
+                        "inverse-primary": "#006976",
+                        "surface-variant": "#202633",
+                        "error-dim": "#d7383b",
+                        "surface-container-lowest": "#000000",
+                        "surface-container-highest": "#202633",
+                        "secondary-dim": "#8d96f4",
+                        "on-tertiary-fixed": "#1c0055",
+                        "tertiary": "#a68cff",
+                        "on-tertiary-container": "#ffffff",
+                        "outline-variant": "#444852",
+                        "secondary": "#929bfa",
+                        "surface-bright": "#262c3a",
+                        "on-background": "#ebedfb",
+                        "on-primary-container": "#004d57",
+                        "surface-tint": "#81ecff",
+                        "outline": "#727581",
+                        "secondary-fixed-dim": "#babfff",
+                        "secondary-container": "#343d96",
+                        "background": "#0a0e17",
+                        "primary": "#81ecff",
+                        "tertiary-container": "#7c4dff",
+                        "inverse-on-surface": "#515560",
+                        "on-secondary": "#0b1574",
+                        "on-error": "#490006",
+                        "inverse-surface": "#faf9ff",
+                        "surface": "#0a0e17",
+                        "primary-dim": "#00d4ec",
+                        "on-tertiary-fixed-variant": "#4000ad",
+                        "tertiary-dim": "#7e51ff",
+                        "on-error-container": "#ffa8a3",
+                        "on-primary": "#005762",
+                        "on-surface": "#ebedfb",
+                        "surface-container-low": "#0f131d",
+                        "error-container": "#9f0519",
+                        "secondary-fixed": "#cbceff",
+                        "surface-container-high": "#1a1f2c",
+                        "primary-container": "#00e3fd",
+                        "error": "#ff716c",
+                        "tertiary-fixed": "#b8a3ff",
+                        "on-secondary-container": "#c9cdff",
+                        "on-primary-fixed": "#003840"
+                    },
+                    fontFamily: {
+                        "headline": ["Outfit"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(26, 31, 44, 0.4);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(129, 236, 255, 0.1);
+        }
+        .kinetic-gradient {
+            background: linear-gradient(135deg, #81ecff 0%, #00d4ec 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen selection:bg-primary/30">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/40 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
+<div class="flex justify-between items-center h-16 px-6 w-full max-w-none">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600 font-['Space_Grotesk']">TECHRENTAL</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Space_Grotesk'] tracking-tight" href="#">Browse</a>
+<a class="text-cyan-400 font-bold border-b-2 border-cyan-400 pb-1 font-['Space_Grotesk'] tracking-tight" href="#">List Gear</a>
+<a class="text-slate-400 hover:text-slate-200 transition-colors font-['Space_Grotesk'] tracking-tight" href="#">Earnings</a>
 </div>
-
-<script>
-    document.getElementById('createForm').addEventListener('submit', function() {
-        document.getElementById('btnText').innerText = 'Generating Listing...';
-        document.getElementById('btnSpinner').classList.remove('d-none');
-        document.getElementById('submitBtn').disabled = true;
-    });
-</script>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:bg-white/5 transition-all duration-300 rounded-full active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-400 hover:bg-white/5 transition-all duration-300 rounded-full active:scale-95">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest border border-white/10 overflow-hidden ml-2">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="Close up portrait of a professional man in a tech environment with soft blue neon backlighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-cjBzZuCKRwZKszmcsxgRMe9mhE3sgBARzx_oidk1Q71ufl3X5IHNc_-dcYSJbBdJSbfunTHeXEcpAqTp3Ek6IB_KbuCOPwIfH8uFFLVPLTJIyf7TyYbAMWhK_ALfH7UxuAiZ6cyDu9GHR-fEIiy_Hd-6LFzdlusXXdYkfpl__iCIMhXG1Y7dHfp1Gd-0c-Geo4SsdbbDAcArucQnNjUOVvEZaXJmXOW4JA0cAqj_SZktEkP6kPK8PRVKJNm5_qJVaQWSCsaMMc4"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="relative pt-32 pb-24 px-6 overflow-hidden">
+<!-- Background Elements -->
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full -z-10"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary/10 blur-[100px] rounded-full -z-10"></div>
+<div class="max-w-4xl mx-auto">
+<!-- Header Section -->
+<div class="text-center mb-12">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-label font-bold tracking-widest uppercase mb-6">
+<span class="material-symbols-outlined text-[14px]" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                    AI-Powered Listing
+                </div>
+<h1 class="text-5xl md:text-6xl font-headline font-extrabold text-on-background tracking-tight mb-4 leading-tight">
+                    Turn Your Gear Into <br/>
+<span class="text-transparent bg-clip-text kinetic-gradient">Kinetic Capital</span>
+</h1>
+<p class="text-on-surface-variant text-lg max-w-xl mx-auto font-body">
+                    Upload a photo and let our AI handle the technical specs, pricing, and description for a high-performance rental listing.
+                </p>
+</div>
+<!-- Main Form Card -->
+<div class="glass-panel rounded-[2rem] p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 relative overflow-hidden">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+<!-- Left Column: Visual Assets -->
+<div class="space-y-6">
+<div class="group relative aspect-square rounded-2xl bg-surface-container-lowest border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-all duration-500 overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<img alt="Camera Gear Placeholder" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="Professional cinema camera on a tripod in a dark studio with dramatic cyan and violet lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWrsF17u98F-L0_-tjc0GUB7mbLuFz8PWcXgqDKht8fMEZC5nwsVLcnJ6wqFprI--Ba7by7bsezBqMLTFbXn_QfCbT6ZsGYrxz_JtCExNugff5KiWu3JRlJZSA4DgJHWvD2d_4PoxoE7ZDHFqnhOIuMjCO9vVVHtqoTD4VTmZJORBNcAO7v5YLplxckZwx8s036WCZi_4lMvWWo_Xn1mX8ujB4WYvR0C5kBZfUdt57d5-2y5rjIbuXBiJ2ZmlyRsiqYKv9bTMWUFs"/>
+<div class="relative z-10 flex flex-col items-center p-6 text-center">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-4 shadow-xl">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="add_a_photo">add_a_photo</span>
+</div>
+<span class="text-on-surface font-headline text-lg font-bold">Drop your gear image</span>
+<span class="text-on-surface-variant text-sm mt-1">AI will analyze brand and model</span>
+</div>
+</div>
+<div class="p-6 rounded-xl bg-surface-container-low border border-outline-variant/20">
+<h3 class="font-label text-xs uppercase tracking-[0.2em] text-primary-fixed-dim mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="insights">insights</span>
+                                Live Market Insights
+                            </h3>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-on-surface-variant text-xs mb-1">Average daily rate</p>
+<p class="text-3xl font-headline font-bold text-on-surface">$45.00</p>
+</div>
+<div class="text-right">
+<p class="text-tertiary font-label text-xs font-bold uppercase tracking-wider">+12% Demand</p>
+<div class="h-1.5 w-24 bg-surface-container-highest rounded-full mt-2 overflow-hidden">
+<div class="h-full bg-primary w-3/4 shadow-[0_0_8px_rgba(129,236,255,0.6)]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Details -->
+<div class="flex flex-col gap-6">
+<div class="group">
+<label class="block text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Item Name</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-body" placeholder="e.g. Sony Alpha a7R IV" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="group">
+<label class="block text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Condition</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-body appearance-none cursor-pointer">
+<option>Brand New</option>
+<option>Excellent</option>
+<option>Good</option>
+<option>Well Used</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3.5 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="group">
+<label class="block text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Price / Day</label>
+<div class="relative">
+<span class="absolute left-4 top-3.5 text-primary-fixed-dim font-bold">$</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg pl-8 pr-4 py-3 text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-body" placeholder="0.00" type="number"/>
+</div>
+</div>
+</div>
+<div class="group relative">
+<div class="flex justify-between items-center mb-2">
+<label class="text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant group-focus-within:text-primary transition-colors">Short Description</label>
+<button class="flex items-center gap-1 text-[10px] font-label font-bold uppercase tracking-tighter text-tertiary-fixed-dim hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined text-[12px]" data-icon="bolt">bolt</span>
+                                    Improve with AI
+                                </button>
+</div>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-body resize-none" placeholder="Describe the key features and inclusions..." rows="4"></textarea>
+</div>
+<div class="mt-4">
+<button class="w-full kinetic-gradient text-on-primary-fixed font-headline font-extrabold text-lg py-4 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,212,236,0.4)] hover:shadow-[0_15px_35px_-5px_rgba(0,212,236,0.5)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+<span class="material-symbols-outlined" data-icon="auto_fix_high" style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+                                Generate Listing
+                            </button>
+<p class="text-center text-[10px] font-label text-outline uppercase tracking-widest mt-4">
+                                Our neural network will optimize your post for 30% higher conversion
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 w-full py-12 border-t border-white/5 mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 gap-6 w-full">
+<div class="flex flex-col items-center md:items-start">
+<span class="text-lg font-bold text-slate-200 font-['Space_Grotesk'] tracking-tighter mb-2">TECHRENTAL</span>
+<p class="font-['Inter'] text-[10px] uppercase tracking-widest text-slate-500">© 2024 TECHRENTAL KINETIC ETHER. ALL RIGHTS RESERVED.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-slate-500 hover:text-cyan-300 transition-colors" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-slate-500 hover:text-cyan-300 transition-colors" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-slate-500 hover:text-cyan-300 transition-colors" href="#">Rental Agreement</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-slate-500 hover:text-cyan-300 transition-colors" href="#">Carbon Neutrality</a>
+</div>
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined text-sm" data-icon="share">share</span>
+</div>
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined text-sm" data-icon="language">language</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>
