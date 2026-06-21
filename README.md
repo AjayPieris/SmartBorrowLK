@@ -1,5 +1,7 @@
 # SmartBorrowLK
 
+**🔗 Live Demo:** [http://smartborrowlk.us-east-1.elasticbeanstalk.com](http://smartborrowlk.us-east-1.elasticbeanstalk.com)
+
 **Rent Smart. Earn Easy. AI-powered tech rental platform in Sri Lanka.**
 
 SmartBorrowLK is a full-stack, enterprise-grade web application built with **ASP.NET Core MVC (.NET 10)**. It serves as a modern marketplace where users can list, rent, and manage tech gear and equipment safely and efficiently. The platform features robust role-based access control, real-time messaging, AI integrations, and a seamless booking workflow.

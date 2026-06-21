@@ -3,32 +3,32 @@
     ViewData["Title"] = "My Bookings";
 }
 
-<div class="container py-5">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end mb-5 gap-3 fade-in-up">
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
         <div>
-            <h2 class="fw-bold mb-1" style="font-size: 2rem;">My Bookings</h2>
-            <p style="color: var(--sb-text-muted); margin-bottom: 0;">Track your current and past rentals</p>
+            <h2 class="mb-1">My Bookings</h2>
+            <p class="text-muted mb-0">Track your current and past rentals</p>
         </div>
-        <a asp-controller="Listing" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4">
+        <a asp-controller="Listing" asp-action="Index" class="btn btn-outline-primary">
             <i class="bi bi-search me-1"></i> Find Gear
         </a>
     </div>
 
     @if (!Model.Any())
     {
-        <div class="empty-state fade-in-up">
-            <i class="bi bi-calendar-x"></i>
-            <h4 class="fw-bold mt-3 mb-2">No bookings yet</h4>
-            <p style="color: var(--sb-text-muted);">You haven't rented any items. Head to the marketplace to find gear!</p>
-            <a asp-controller="Listing" asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-2">Explore Marketplace</a>
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-calendar-x display-4 mb-3"></i>
+            <h4>No bookings yet</h4>
+            <p>You haven't rented any items. Head to the marketplace to find gear!</p>
+            <a asp-controller="Listing" asp-action="Index" class="btn btn-primary mt-2">Explore Marketplace</a>
         </div>
     }
     else
     {
-        <div class="glass-panel overflow-hidden fade-in-up delay-1">
+        <div class="card shadow-sm">
             <div class="table-responsive">
-                <table class="table mb-0">
-                    <thead>
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
                             <th class="ps-4">Item Reserved</th>
                             <th>Rental Dates</th>
@@ -46,17 +46,17 @@
                             var isPast = booking.EndDate < DateTime.UtcNow.Date;
 
                             <tr>
-                                <td class="ps-4">
+                                <td class="ps-4 py-3">
                                     <div class="d-flex align-items-center">
                                         @if (!string.IsNullOrEmpty(booking.Listing.Item?.ImageUrl))
                                         {
                                             <img src="@booking.Listing.Item.ImageUrl" alt="@booking.Listing.Item.Name"
-                                                 class="me-3" style="width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--sb-outline);" />
+                                                 class="me-3 rounded object-fit-cover border" style="width: 48px; height: 48px;" />
                                         }
                                         else
                                         {
-                                            <div class="me-3 d-flex align-items-center justify-content-center"
-                                                 style="width: 48px; height: 48px; border-radius: 10px; background: var(--sb-surface); color: var(--sb-text-dim);">
+                                            <div class="me-3 d-flex align-items-center justify-content-center bg-light rounded text-muted"
+                                                 style="width: 48px; height: 48px;">
                                                 <i class="bi bi-camera"></i>
                                             </div>
                                         }
@@ -64,42 +64,42 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fw-medium">@booking.StartDate.ToString("MMM dd, yyyy")</div>
-                                    <div class="small" style="color: var(--sb-text-muted);">to @booking.EndDate.ToString("MMM dd, yyyy")</div>
+                                    <div>@booking.StartDate.ToString("MMM dd, yyyy")</div>
+                                    <div class="small text-muted">to @booking.EndDate.ToString("MMM dd, yyyy")</div>
                                 </td>
-                                <td style="color: var(--sb-text-muted);">@days Days</td>
-                                <td class="fw-bold text-price">Rs. @totalCost.ToString("N0")</td>
+                                <td class="text-muted">@days Days</td>
+                                <td class="fw-bold">Rs. @totalCost.ToString("N0")</td>
                                 <td>
                                     @if (booking.Status == "Pending")
                                     {
-                                        <span class="status-pill pending">Pending</span>
+                                        <span class="badge bg-warning text-dark">Pending</span>
                                     }
                                     else if (booking.Status == "Rejected")
                                     {
-                                        <span class="status-pill rejected">Rejected</span>
+                                        <span class="badge bg-danger">Rejected</span>
                                     }
                                     else if (isPast)
                                     {
-                                        <span class="badge bg-secondary-subtle">Completed</span>
+                                        <span class="badge bg-secondary">Completed</span>
                                     }
                                     else if (booking.StartDate > DateTime.UtcNow.Date)
                                     {
-                                        <span class="status-pill approved">Upcoming</span>
+                                        <span class="badge bg-info text-dark">Upcoming</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-success-subtle">Active Now</span>
+                                        <span class="badge bg-success">Active Now</span>
                                     }
                                 </td>
                                 <td class="text-end pe-4">
                                     <a asp-controller="Listing" asp-action="Details" asp-route-id="@booking.ListingId"
-                                       class="btn btn-light btn-sm rounded-pill px-3 me-1">
+                                       class="btn btn-light btn-sm me-1">
                                         View
                                     </a>
                                     @if (isPast && booking.Status == "Approved")
                                     {
                                         <a asp-controller="Review" asp-action="Create" asp-route-listingId="@booking.ListingId"
-                                           class="btn btn-outline-warning btn-sm rounded-pill px-3">
+                                           class="btn btn-outline-warning btn-sm">
                                             <i class="bi bi-star-fill me-1"></i> Review
                                         </a>
                                     }
